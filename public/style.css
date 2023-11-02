@@ -217,5 +217,27 @@ button {
 }
 
 .banner {
+    margin-top: 180px;
+    margin: 50px;
+    justify-content: center;
+    align-items: center;
+    text-align: justify;
     color: white;
+}
+
+.banner h1 {
+    margin-bottom: 50px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.banner p {
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .banner p {
+        text-align: justify;
+    }
 }
