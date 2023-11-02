@@ -1,13 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=, initial-scale=1.0">
-  <title>Document</title>
+
+  <title>Farol Acessibilidade</title>
+
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta nome="author" content="Alexander Medeiros">
+  <meta nome="description" content="Intérprete de Libras">
+
+  <!-- Link css -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="./favicon_io/favicon.ico" type="image/x-icon" />
+
+  <!-- Link google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
+
 <body>
-  <section>
-    <h1>Alexander e Jonathan</h1>
-  </section>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="overlay" data-overlay></div>
+      <a href="index2.html" class="logo">
+        <img src="../logo120x90.png" alt="FAROL" />
+      </a>
+
+      <div class="header-actions">
+        <button class="search">
+          <ion-icon name="search-outline"></ion-icon>
+        </button>
+
+        <div class="lang-wrapper">
+          <label for="language">
+            <ion-icon name="globe-outline"></ion-icon>
+          </label>
+
+          <select name="language" id="language">
+            <option value="en">EN</option>
+            <option value="es">ES</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary">Entrar</button>
+      </div>
+
+      <button class="btn-mobile" data-menu-open>
+        <ion-icon name="reorder-three-outline"></ion-icon>
+      </button>
+
+      <nav class="navbar" data-navbar>
+        <div class="navbar-top">
+          <!--<a href="index.html">
+                        <img src="alexanderLogo120x90.png" alt="logo" />
+                    </a>-->
+
+          <button class="menu-close" data-menu-close>
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+
+        <ul class="navbar-list">
+          <li>
+            <a href="index2.html" class="navbar-link">HOME</a>
+          </li>
+
+          <li>
+            <a href="#" class="navbar-link">QUEM SOMOS</a>
+          </li>
+
+          <li>
+            <a href="#" class="navbar-link">PARCERIAS</a>
+          </li>
+
+          <li>
+            <a href="#" class="navbar-link">Séries</a>
+          </li>
+
+          <li>
+            <a href="#" class="navbar-link">CONTATO</a>
+          </li>
+        </ul>
+
+        <ul class="navbar-social-list">
+          <li>
+            <a href="#" class="navbar-social-link">
+              <ion-icon name="logo-facebook"></ion-icon>
+            </a>
+          </li>
+
+          <li>
+            <a href="#" class="navbar-social-link">
+              <ion-icon name="logo-instagram"></ion-icon>
+            </a>
+          </li>
+
+          <li>
+            <a href="#" class="navbar-social-link">
+              <ion-icon name="logo-twitter"></ion-icon>
+            </a>
+          </li>
+
+          <li>
+            <a href="#" class="navbar-social-link">
+              <ion-icon name="logo-youtube"></ion-icon>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="banner">
+      <div>
+        <h1>
+          ACESSIBILIDADE E INCLUSÃO COMO VALOR
+        </h1>
+      </div>
+
+      <div>
+        <p>Acessibilidade e inclusão não são mais qualidades que impressionam a sociedade atual. Entretanto, a
+          manutenção de barreiras atitudinais arquitetônicas, comunicacionais e práticas excludentes são repudiadas.
+          </br>
+          A legislação brasileira segue a tendência mundial e garante às pessoas com deficiência acesso a todo e
+          qualquer serviço ou espaço.
+          </br>
+          Às pessoas surdas são garantidos o direto à acessibilidade comunicacional e linguística. Isso se dá através da
+          disponibilização de profissionais tradutores e intérpretes da Língua Brasileira de Sinais (LIBRAS)/Língua
+          Portuguesa.</p>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- Link Js-->
+  <script src="index.js"></script>
+
+  <!-- Link ícones -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
+
 </html>
