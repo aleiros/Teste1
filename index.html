@@ -1,98 +1,131 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Cadastro Local Avançado</title>
+  <meta charset="utf-8" />
+  <title>Login + Cadastro Local Avançado</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f9f9f9;
-    }
-    h2 { text-align: center; }
-    input { padding: 5px; margin: 5px; width: 200px; }
-    button { padding: 5px 10px; margin: 5px; cursor: pointer; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #4CAF50;
-      color: white;
-    }
-    tr:nth-child(even){background-color: #f2f2f2;}
-    tr:hover {background-color: #ddd;}
-    td input { width: 90%; padding: 4px; }
+    /* ----- Layout geral (estilo parecido com seu modelo) ----- */
+    body { font-family: Arial, sans-serif; margin: 16px; background: #f9f9f9; color:#222 }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    .card { background:#fff; padding:18px; border-radius:8px; box-shadow:0 3px 12px rgba(0,0,0,0.06); margin-bottom:16px; }
+    h2 { text-align:center; margin:0 0 12px 0; color:#333 }
 
-    /* Botões dentro da célula */
-    td button {
-      padding: 5px 10px;
-      margin: 2px;
-      border: none;
-      border-radius: 4px;
-      color: white;
-    }
-    td button:first-child { background: #2196F3; } /* Alterar */
-    td button:last-child { background: #f44336; }  /* Apagar */
+    input { padding:6px; margin:6px 6px 6px 0; width:220px; border:1px solid #ccc; border-radius:4px; }
+    button { padding:6px 10px; margin:6px 6px 6px 0; border:none; border-radius:6px; cursor:pointer; color:white; background:#4CAF50; }
+    button.secondary { background:#2196F3 }
+    button.warn { background:#f44336 }
+    button.gray { background:#888 }
+    a { color:#2196F3; text-decoration:none }
+    a:hover { text-decoration:underline }
 
-    /* Responsividade para celular */
-    @media (max-width: 600px) {
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-      input {
-        width: 100%;
-      }
-      button {
-        width: 100%;
-        margin: 3px 0;
-      }
-      td button {
-        display: inline-block;
-        width: auto;
-      }
+    /* Tabela estilo Cadastro Local Avançado (copiado do modelo) */
+    table { width:100%; border-collapse:collapse; margin-top:12px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.04) }
+    th, td { border:1px solid #ddd; padding:8px; text-align:left; }
+    th { background:#4CAF50; color:#fff }
+    tr:nth-child(even){background:#f7f7f7}
+    tr:hover { background:#eee }
+    td input { width:95%; padding:6px; box-sizing:border-box }
+
+    /* Responsividade */
+    @media (max-width:720px) {
+      input { width:100%; display:block }
+      .actions { display:flex; flex-wrap:wrap }
+      .two-cols { display:block }
     }
+
+    .hidden { display:none }
+    .top-right { float:right }
+    .msg { font-weight:600; margin:6px 0 }
   </style>
 </head>
 <body>
-  <h2>Cadastro Local com Edição Inline</h2>
+  <div class="wrap">
 
-  <div>
-    <input id="nome" placeholder="Nome">
-    <input id="sobrenome" placeholder="Sobrenome">
-    <input id="email" placeholder="Email">
-    <button onclick="salvar()">💾 Salvar</button>
-    <button onclick="apagarTudo()">🗑️ Apagar todos</button>
-    <button onclick="escolherPasta()">📁 Escolher pasta</button>
-    <button onclick="exportarTXT()">💾 Exportar TXT</button>
-    <button onclick="exportarExcel()">📊 Exportar Excel</button>
+    <!-- LOGIN / REGISTRO -->
+    <div id="authCard" class="card">
+      <h2 id="authTitle">Registrar</h2>
+
+      <!-- Registro -->
+      <div id="registerView">
+        <input id="regNome" placeholder="Nome completo" />
+        <input id="regEmail" placeholder="E-mail" type="email" />
+        <input id="regSenha" placeholder="Senha" type="password" />
+        <input id="regSenhaConf" placeholder="Confirmar senha" type="password" />
+        <div class="actions">
+          <button onclick="registrar()">Criar conta</button>
+          <button class="gray" onclick="mostrarLogin()">Já tenho conta</button>
+        </div>
+        <p id="regMsg" class="msg"></p>
+      </div>
+
+      <!-- Login -->
+      <div id="loginView" class="hidden">
+        <input id="logEmail" placeholder="E-mail" type="email" />
+        <input id="logSenha" placeholder="Senha" type="password" />
+        <div class="actions">
+          <button onclick="entrar()">Entrar</button>
+          <button class="gray" onclick="mostrarRegistro()">Criar conta</button>
+        </div>
+        <p id="logMsg" class="msg"></p>
+      </div>
+    </div>
+
+    <!-- ÁREA DO USUÁRIO (CADASTRO LOCAL AVANÇADO) -->
+    <div id="mainCard" class="card hidden">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <h2>Cadastro Local Avançado</h2>
+        <div>
+          <span id="userBadge"></span>
+          <button class="warn" onclick="sair()">Sair</button>
+        </div>
+      </div>
+
+      <!-- Formulário do Cadastro (mesmo layout que você enviou) -->
+      <div style="margin-top:12px;">
+        <input id="cNome" placeholder="Nome" />
+        <input id="cSobrenome" placeholder="Sobrenome" />
+        <input id="cEmail" placeholder="Email" type="email" />
+        <button onclick="adicionarRegistro()">💾 Salvar</button>
+        <button class="warn" onclick="apagarTudo()">🗑️ Apagar todos</button>
+        <button class="secondary" onclick="escolherPasta()">📁 Escolher pasta</button>
+        <button onclick="exportarTXT()">💾 Exportar TXT</button>
+        <button onclick="exportarExcel()">📊 Exportar Excel</button>
+        <p id="mainMsg" class="msg"></p>
+      </div>
+
+      <!-- Tabela -->
+      <table id="tabela">
+        <thead>
+          <tr>
+            <th>UUID</th>
+            <th>Nome</th>
+            <th>Sobrenome</th>
+            <th>Email</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
   </div>
 
-  <table id="tabela">
-    <thead>
-      <tr>
-        <th>UUID</th>
-        <th>Nome</th>
-        <th>Sobrenome</th>
-        <th>Email</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
   <script>
-    let pastaHandle = null;
+    /************************************************************************
+     * Estrutura de armazenamento
+     * - usuarios: array de { nome, email, senha } (localStorage key "usuarios")
+     * - usuarioLogado: objeto user (localStorage key "usuarioLogado")
+     * - cadastros por usuário: key "cadastros_<safeEmail>" -> array de registros
+     *
+     * Cada usuário vê apenas seus cadastros.
+     ************************************************************************/
+
+    // ---------- Helpers ----------
+    function safeKeyForEmail(email){
+      // transforma e-mail em chave segura para localStorage
+      return 'cadastros_' + encodeURIComponent(email.toLowerCase());
+    }
 
     function gerarUUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -101,81 +134,153 @@
       });
     }
 
-    async function escolherPasta() {
-      try {
-        pastaHandle = await window.showDirectoryPicker();
-        alert("Pasta selecionada com sucesso!");
-        await carregarArquivo();
-      } catch {
-        alert("Permissão negada ou cancelada.");
+    // pastaHandle (API File System) - sessão (não persistimos entre reloads)
+    let pastaHandle = null;
+
+    // ---------- AUTENTICAÇÃO (localStorage) ----------
+    function mostrarRegistro(){
+      document.getElementById('registerView').classList.remove('hidden');
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('authTitle').textContent = 'Registrar';
+      clearMsgs();
+    }
+
+    function mostrarLogin(){
+      document.getElementById('registerView').classList.add('hidden');
+      document.getElementById('loginView').classList.remove('hidden');
+      document.getElementById('authTitle').textContent = 'Login';
+      clearMsgs();
+    }
+
+    function clearMsgs(){
+      document.getElementById('regMsg').textContent = '';
+      document.getElementById('logMsg').textContent = '';
+      document.getElementById('mainMsg').textContent = '';
+    }
+
+    function registrar(){
+      const nome = document.getElementById('regNome').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const senha = document.getElementById('regSenha').value;
+      const senhaConf = document.getElementById('regSenhaConf').value;
+      const msg = document.getElementById('regMsg');
+
+      if(!nome || !email || !senha || !senhaConf){
+        msg.style.color='red'; msg.textContent='Preencha todos os campos!';
+        return;
+      }
+      if(senha.length < 4){
+        msg.style.color='red'; msg.textContent='Senha muito curta (mínimo 4 caracteres)!';
+        return;
+      }
+      if(senha !== senhaConf){
+        msg.style.color='red'; msg.textContent='As senhas não coincidem!';
+        return;
+      }
+
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      if(usuarios.find(u => u.email === email)){
+        msg.style.color='red'; msg.textContent='E-mail já cadastrado!';
+        return;
+      }
+
+      usuarios.push({ nome, email, senha });
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      msg.style.color='green'; msg.textContent='Conta criada! Você já pode entrar.';
+      // limpa campos
+      document.getElementById('regNome').value='';
+      document.getElementById('regEmail').value='';
+      document.getElementById('regSenha').value='';
+      document.getElementById('regSenhaConf').value='';
+      setTimeout(mostrarLogin, 900);
+    }
+
+    function entrar(){
+      const email = document.getElementById('logEmail').value.trim().toLowerCase();
+      const senha = document.getElementById('logSenha').value;
+      const msg = document.getElementById('logMsg');
+
+      if(!email || !senha){
+        msg.style.color='red'; msg.textContent='Preencha e-mail e senha!';
+        return;
+      }
+
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      const user = usuarios.find(u => u.email === email && u.senha === senha);
+      if(!user){
+        msg.style.color='red'; msg.textContent='E-mail ou senha incorretos!';
+        return;
+      }
+
+      localStorage.setItem('usuarioLogado', JSON.stringify(user));
+      // preparar pastaHandle como nulo (usuário pode escolher depois)
+      pastaHandle = null;
+      mostrarAreaUsuario();
+    }
+
+    function sair(){
+      localStorage.removeItem('usuarioLogado');
+      // limpa pasta temporária
+      pastaHandle = null;
+      document.getElementById('mainCard').classList.add('hidden');
+      document.getElementById('authCard').classList.remove('hidden');
+      mostrarLogin();
+    }
+
+    // ---------- ÁREA PRINCIPAL: CRUD (por usuário) ----------
+    function getUsuarioLogado(){
+      return JSON.parse(localStorage.getItem('usuarioLogado'));
+    }
+
+    function carregarCadastros(){
+      const u = getUsuarioLogado();
+      if(!u) return [];
+      const key = safeKeyForEmail(u.email);
+      return JSON.parse(localStorage.getItem(key)) || [];
+    }
+
+    function salvarCadastros(lista){
+      const u = getUsuarioLogado();
+      if(!u) return;
+      const key = safeKeyForEmail(u.email);
+      localStorage.setItem(key, JSON.stringify(lista));
+      // se pasta escolhida, atualiza arquivos também
+      if(pastaHandle) {
+        salvarArquivo('usuarios.json', JSON.stringify(lista, null, 2));
+        salvarArquivo('usuarios.txt', gerarTXT(lista));
       }
     }
 
-    async function salvar() {
-      const nome = document.getElementById("nome").value.trim();
-      const sobrenome = document.getElementById("sobrenome").value.trim();
-      const email = document.getElementById("email").value.trim();
-      if (!nome || !sobrenome || !email) return alert("Preencha todos os campos!");
-
-      const uuid = gerarUUID();
-      const dados = { uuid, nome, sobrenome, email };
-
-      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      lista.push(dados);
-      localStorage.setItem("usuarios", JSON.stringify(lista));
-      mostrar();
-
-      if (pastaHandle) {
-        await salvarArquivo("usuarios.json", JSON.stringify(lista, null, 2));
-        await salvarArquivo("usuarios.txt", gerarTXT(lista));
-      }
-
-      document.getElementById("nome").value = "";
-      document.getElementById("sobrenome").value = "";
-      document.getElementById("email").value = "";
-    }
-
-    function mostrar() {
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const tbody = document.querySelector("#tabela tbody");
-      tbody.innerHTML = "";
-
+    function mostrarTabela(){
+      const lista = carregarCadastros();
+      const tbody = document.querySelector('#tabela tbody');
+      tbody.innerHTML = '';
       lista.forEach(item => {
-        const tr = document.createElement("tr");
+        const tr = document.createElement('tr');
 
-        const tdUUID = document.createElement("td");
-        tdUUID.textContent = item.uuid;
-        tr.appendChild(tdUUID);
+        const tdUUID = document.createElement('td'); tdUUID.textContent = item.uuid; tr.appendChild(tdUUID);
 
-        const tdNome = document.createElement("td");
-        const inputNome = document.createElement("input");
-        inputNome.value = item.nome;
+        const tdNome = document.createElement('td');
+        const inputNome = document.createElement('input'); inputNome.value = item.nome;
         inputNome.onchange = () => atualizarCampo(item.uuid, 'nome', inputNome.value);
-        tdNome.appendChild(inputNome);
-        tr.appendChild(tdNome);
+        tdNome.appendChild(inputNome); tr.appendChild(tdNome);
 
-        const tdSobrenome = document.createElement("td");
-        const inputSob = document.createElement("input");
-        inputSob.value = item.sobrenome;
+        const tdSob = document.createElement('td');
+        const inputSob = document.createElement('input'); inputSob.value = item.sobrenome;
         inputSob.onchange = () => atualizarCampo(item.uuid, 'sobrenome', inputSob.value);
-        tdSobrenome.appendChild(inputSob);
-        tr.appendChild(tdSobrenome);
+        tdSob.appendChild(inputSob); tr.appendChild(tdSob);
 
-        const tdEmail = document.createElement("td");
-        const inputEmail = document.createElement("input");
-        inputEmail.value = item.email;
+        const tdEmail = document.createElement('td');
+        const inputEmail = document.createElement('input'); inputEmail.value = item.email;
         inputEmail.onchange = () => atualizarCampo(item.uuid, 'email', inputEmail.value);
-        tdEmail.appendChild(inputEmail);
-        tr.appendChild(tdEmail);
+        tdEmail.appendChild(inputEmail); tr.appendChild(tdEmail);
 
-        const tdAcoes = document.createElement("td");
-        const btnAlterar = document.createElement("button");
-        btnAlterar.textContent = "Alterar";
+        const tdAcoes = document.createElement('td');
+        const btnAlterar = document.createElement('button'); btnAlterar.textContent='Alterar'; btnAlterar.className='secondary';
         btnAlterar.onclick = () => atualizarRegistro(item.uuid);
         tdAcoes.appendChild(btnAlterar);
 
-        const btnApagar = document.createElement("button");
-        btnApagar.textContent = "Apagar";
+        const btnApagar = document.createElement('button'); btnApagar.textContent='Apagar'; btnApagar.className='warn';
         btnApagar.onclick = () => apagar(item.uuid);
         tdAcoes.appendChild(btnApagar);
 
@@ -184,129 +289,167 @@
       });
     }
 
-    async function atualizarCampo(uuid, campo, valor) {
-      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const item = lista.find(u => u.uuid === uuid);
-      if (!item) return;
+    function adicionarRegistro(){
+      const nome = document.getElementById('cNome').value.trim();
+      const sobrenome = document.getElementById('cSobrenome').value.trim();
+      const email = document.getElementById('cEmail').value.trim();
+      const msg = document.getElementById('mainMsg');
+
+      if(!nome || !sobrenome || !email){
+        msg.style.color='red'; msg.textContent='Preencha todos os campos!';
+        return;
+      }
+
+      const lista = carregarCadastros();
+      const uuid = gerarUUID();
+      const dados = { uuid, nome, sobrenome, email };
+      lista.push(dados);
+      salvarCadastros(lista);
+      mostrarTabela();
+      msg.style.color='green'; msg.textContent='Registro salvo!';
+      document.getElementById('cNome').value=''; document.getElementById('cSobrenome').value=''; document.getElementById('cEmail').value='';
+      setTimeout(()=> msg.textContent='',1200);
+    }
+
+    async function atualizarCampo(uuid, campo, valor){
+      let lista = carregarCadastros();
+      const item = lista.find(i => i.uuid === uuid);
+      if(!item) return;
       item[campo] = valor.trim();
-      localStorage.setItem("usuarios", JSON.stringify(lista));
-      if (pastaHandle) {
-        await salvarArquivo("usuarios.json", JSON.stringify(lista, null, 2));
-        await salvarArquivo("usuarios.txt", gerarTXT(lista));
+      salvarCadastros(lista);
+    }
+
+    async function atualizarRegistro(uuid){
+      let lista = carregarCadastros();
+      const item = lista.find(i => i.uuid === uuid);
+      if(!item) return;
+      // pega valores da linha
+      const tr = [...document.querySelectorAll('#tabela tbody tr')].find(r => r.firstChild.textContent === uuid);
+      if(!tr) return;
+      item.nome = tr.querySelector('td:nth-child(2) input').value.trim();
+      item.sobrenome = tr.querySelector('td:nth-child(3) input').value.trim();
+      item.email = tr.querySelector('td:nth-child(4) input').value.trim();
+      salvarCadastros(lista);
+      alert('Registro atualizado!');
+    }
+
+    function apagar(uuid){
+      if(!confirm('Apagar este registro?')) return;
+      let lista = carregarCadastros();
+      lista = lista.filter(i => i.uuid !== uuid);
+      salvarCadastros(lista);
+      mostrarTabela();
+    }
+
+    function apagarTudo(){
+      if(!confirm('Apagar todos os dados?')) return;
+      const u = getUsuarioLogado();
+      if(!u) return;
+      const key = safeKeyForEmail(u.email);
+      localStorage.setItem(key, JSON.stringify([]));
+      mostrarTabela();
+      // se pasta escolhida, atualiza arquivos
+      if(pastaHandle){
+        salvarArquivo('usuarios.json', '[]');
+        salvarArquivo('usuarios.txt', '[]');
       }
     }
 
-    async function atualizarRegistro(uuid) {
-      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const item = lista.find(u => u.uuid === uuid);
-      if (!item) return;
-
-      const tr = [...document.querySelectorAll("#tabela tbody tr")]
-                  .find(r => r.firstChild.textContent === uuid);
-      if (!tr) return;
-
-      item.nome = tr.querySelector("td:nth-child(2) input").value.trim();
-      item.sobrenome = tr.querySelector("td:nth-child(3) input").value.trim();
-      item.email = tr.querySelector("td:nth-child(4) input").value.trim();
-
-      localStorage.setItem("usuarios", JSON.stringify(lista));
-      if (pastaHandle) {
-        await salvarArquivo("usuarios.json", JSON.stringify(lista, null, 2));
-        await salvarArquivo("usuarios.txt", gerarTXT(lista));
-      }
-      alert("Registro atualizado!");
-    }
-
-    async function apagar(uuid) {
-      if (!confirm("Apagar este registro?")) return;
-      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      lista = lista.filter(item => item.uuid !== uuid);
-      localStorage.setItem("usuarios", JSON.stringify(lista));
-      mostrar();
-
-      if (pastaHandle) {
-        await salvarArquivo("usuarios.json", JSON.stringify(lista, null, 2));
-        await salvarArquivo("usuarios.txt", gerarTXT(lista));
-      }
-    }
-
-    async function apagarTudo() {
-      if (!confirm("Apagar todos os dados?")) return;
-      localStorage.removeItem("usuarios");
-      mostrar();
-
-      if (pastaHandle) {
-        await salvarArquivo("usuarios.json", "[]");
-        await salvarArquivo("usuarios.txt", "[]");
-      }
-    }
-
-    function gerarTXT(lista) {
+    function gerarTXT(lista){
       let conteudo = "UUID\tNome\tSobrenome\tEmail\n";
-      lista.forEach(u => {
-        conteudo += `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}\n`;
-      });
+      lista.forEach(u => conteudo += `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}\n`);
       return conteudo;
     }
 
-    async function exportarTXT() {
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      if (lista.length === 0) return alert("Não há dados para exportar!");
-
-      const blob = new Blob([gerarTXT(lista)], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "usuarios.txt";
-      a.click();
-      URL.revokeObjectURL(url);
+    function exportarTXT(){
+      const lista = carregarCadastros();
+      if(lista.length === 0) { alert('Não há dados para exportar!'); return; }
+      const blob = new Blob([gerarTXT(lista)], { type: 'text/plain' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'usuarios.txt'; a.click();
+      URL.revokeObjectURL(a.href);
     }
 
-    async function exportarExcel() {
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      if (lista.length === 0) return alert("Não há dados para exportar!");
-
-      let conteudo = "UUID,Nome,Sobrenome,Email\n";
-      lista.forEach(u => {
-        conteudo += `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"\n`;
-      });
-
-      const blob = new Blob([conteudo], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "usuarios.csv";
-      a.click();
-      URL.revokeObjectURL(url);
+    function exportarExcel(){
+      const lista = carregarCadastros();
+      if(lista.length === 0) { alert('Não há dados para exportar!'); return; }
+      let csv = "UUID,Nome,Sobrenome,Email\n";
+      lista.forEach(u => csv += `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"\n`);
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'usuarios.csv'; a.click();
+      URL.revokeObjectURL(a.href);
     }
 
-    async function salvarArquivo(nomeArquivo, conteudo) {
-      if (!pastaHandle) return;
-      try {
+    // ---------- File System API (opcional) ----------
+    async function escolherPasta(){
+      if(!window.showDirectoryPicker){
+        alert('API de escolha de pasta não suportada neste navegador.');
+        return;
+      }
+      try{
+        pastaHandle = await window.showDirectoryPicker();
+        alert('Pasta selecionada com sucesso!');
+        // tenta carregar arquivo usuarios.json caso exista (sob chave desta pasta, mas cuidado: carregamos só se o arquivo existir)
+        await carregarArquivo();
+      }catch(err){
+        console.warn('Escolha de pasta cancelada/erro', err);
+        pastaHandle = null;
+      }
+    }
+
+    async function salvarArquivo(nomeArquivo, conteudo){
+      if(!pastaHandle) return;
+      try{
         const fileHandle = await pastaHandle.getFileHandle(nomeArquivo, { create: true });
         const writable = await fileHandle.createWritable();
         await writable.write(conteudo);
         await writable.close();
-      } catch (err) {
-        console.error("Erro ao salvar arquivo:", err);
+      }catch(err){
+        console.error('Erro ao salvar arquivo:', err);
       }
     }
 
-    async function carregarArquivo() {
-      if (!pastaHandle) return;
-      try {
-        const fileHandle = await pastaHandle.getFileHandle("usuarios.json");
+    async function carregarArquivo(){
+      if(!pastaHandle) return;
+      try{
+        const fileHandle = await pastaHandle.getFileHandle('usuarios.json');
         const file = await fileHandle.getFile();
         const texto = await file.text();
-        localStorage.setItem("usuarios", texto);
-        mostrar();
-      } catch (err) {
-        console.warn("Arquivo não encontrado ou erro ao carregar:", err);
+        // salvar no localStorage do usuário atual (sobrescreve)
+        const u = getUsuarioLogado();
+        if(!u) return;
+        const key = safeKeyForEmail(u.email);
+        localStorage.setItem(key, texto);
+        mostrarTabela();
+        alert('Arquivo usuarios.json carregado para seus cadastros.');
+      }catch(err){
+        console.warn('Arquivo usuarios.json não encontrado ou erro:', err);
       }
     }
 
-    // Inicializa a tabela ao carregar a página
-    mostrar();
+    // ---------- Inicialização: verifica login ----------
+    function mostrarAreaUsuario(){
+      const u = getUsuarioLogado();
+      if(!u) return;
+      document.getElementById('authCard').classList.add('hidden');
+      document.getElementById('mainCard').classList.remove('hidden');
+      document.getElementById('userBadge').textContent = u.nome + ' (' + u.email + ')';
+      mostrarTabela();
+    }
+
+    window.addEventListener('load', () => {
+      const u = getUsuarioLogado();
+      if(u){
+        mostrarAreaUsuario();
+      } else {
+        mostrarRegistro();
+      }
+    });
+
+    // Segurança leve (opcional): limpar dados sensíveis do DOM quando sair da página
+    window.addEventListener('beforeunload', () => {
+      // NÃO removemos usuários nem cadastros — apenas limpamos variáveis temporárias
+      pastaHandle = null;
+    });
   </script>
 </body>
 </html>
