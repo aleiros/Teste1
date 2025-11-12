@@ -1,100 +1,178 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <title>Login + Cadastro Local Avançado</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Local - Login + Cadastro Avançado</title>
   <style>
-    /* ----- Layout geral (estilo parecido com seu modelo) ----- */
-    body { font-family: Arial, sans-serif; margin: 16px; background: #f9f9f9; color:#222 }
-    .wrap { max-width: 980px; margin: 0 auto; }
-    .card { background:#fff; padding:18px; border-radius:8px; box-shadow:0 3px 12px rgba(0,0,0,0.06); margin-bottom:16px; }
-    h2 { text-align:center; margin:0 0 12px 0; color:#333 }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h2 { text-align: center; margin-top: 20px; }
 
-    input { padding:6px; margin:6px 6px 6px 0; width:220px; border:1px solid #ccc; border-radius:4px; }
-    button { padding:6px 10px; margin:6px 6px 6px 0; border:none; border-radius:6px; cursor:pointer; color:white; background:#4CAF50; }
-    button.secondary { background:#2196F3 }
-    button.warn { background:#f44336 }
-    button.gray { background:#888 }
-    a { color:#2196F3; text-decoration:none }
-    a:hover { text-decoration:underline }
-
-    /* Tabela estilo Cadastro Local Avançado (copiado do modelo) */
-    table { width:100%; border-collapse:collapse; margin-top:12px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.04) }
-    th, td { border:1px solid #ddd; padding:8px; text-align:left; }
-    th { background:#4CAF50; color:#fff }
-    tr:nth-child(even){background:#f7f7f7}
-    tr:hover { background:#eee }
-    td input { width:95%; padding:6px; box-sizing:border-box }
-
-    /* Responsividade */
-    @media (max-width:720px) {
-      input { width:100%; display:block }
-      .actions { display:flex; flex-wrap:wrap }
-      .two-cols { display:block }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    .hidden { display:none }
-    .top-right { float:right }
-    .msg { font-weight:600; margin:6px 0 }
+    input {
+      padding: 8px;
+      margin: 6px 0;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px;
+      width: 100%;
+      margin: 6px 0;
+      border: none;
+      border-radius: 4px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #45a049; }
+
+    .hidden { display: none; }
+
+    /* Área principal */
+    .topbar {
+      background: #4CAF50;
+      color: white;
+      padding: 10px;
+      text-align: right;
+    }
+    .topbar button {
+      background: #f44336;
+      width: auto;
+      padding: 6px 12px;
+    }
+
+    /* Tabela */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th { background: #4CAF50; color: white; }
+    tr:nth-child(even) { background: #f2f2f2; }
+    tr:hover { background: #ddd; }
+
+    td input { width: 90%; padding: 4px; }
+
+    td button {
+      padding: 5px 10px;
+      margin: 2px;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+    td button:first-child { background: #2196F3; } /* Alterar */
+    td button:last-child { background: #f44336; }  /* Apagar */
+
+    /* Responsividade: vira cards */
+    @media (max-width: 720px) {
+      table, thead, tbody, th, td, tr { display: block; width: 100%; }
+      thead { display: none; }
+
+      tr {
+        margin: 0 0 12px 0;
+        padding: 10px;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+        border: 1px solid #e6e6e6;
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 6px;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        box-sizing: border-box;
+      }
+
+      td:last-child { border-bottom: none; }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        margin-right: 10px;
+        flex: 0 0 40%;
+        white-space: nowrap;
+        color: #555;
+        font-size: 0.95em;
+      }
+
+      td input {
+        width: 60%;
+        min-width: 120px;
+      }
+
+      td:last-child {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      .wrap input, .wrap button {
+        width: 100%;
+        display: block;
+        margin: 6px 0;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
 
-    <!-- LOGIN / REGISTRO -->
-    <div id="authCard" class="card">
-      <h2 id="authTitle">Registrar</h2>
+  <!-- Login / Registro -->
+  <div class="container" id="loginRegistro">
+    <h2 id="tituloForm">Registrar</h2>
+    <input id="nome" placeholder="Nome completo" class="campo-registro">
+    <input id="email" placeholder="Email">
+    <input id="senha" placeholder="Senha" type="password">
+    <button onclick="registrar()">Criar conta</button>
+    <button onclick="mostrarLogin()">Já tenho conta</button>
+  </div>
 
-      <!-- Registro -->
-      <div id="registerView">
-        <input id="regNome" placeholder="Nome completo" />
-        <input id="regEmail" placeholder="E-mail" type="email" />
-        <input id="regSenha" placeholder="Senha" type="password" />
-        <input id="regSenhaConf" placeholder="Confirmar senha" type="password" />
-        <div class="actions">
-          <button onclick="registrar()">Criar conta</button>
-          <button class="gray" onclick="mostrarLogin()">Já tenho conta</button>
-        </div>
-        <p id="regMsg" class="msg"></p>
-      </div>
-
-      <!-- Login -->
-      <div id="loginView" class="hidden">
-        <input id="logEmail" placeholder="E-mail" type="email" />
-        <input id="logSenha" placeholder="Senha" type="password" />
-        <div class="actions">
-          <button onclick="entrar()">Entrar</button>
-          <button class="gray" onclick="mostrarRegistro()">Criar conta</button>
-        </div>
-        <p id="logMsg" class="msg"></p>
-      </div>
+  <!-- Área Principal -->
+  <div class="hidden" id="areaPrincipal">
+    <div class="topbar">
+      <span id="usuarioAtual"></span>
+      <button onclick="sair()">Sair</button>
     </div>
 
-    <!-- ÁREA DO USUÁRIO (CADASTRO LOCAL AVANÇADO) -->
-    <div id="mainCard" class="card hidden">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <h2>Cadastro Local Avançado</h2>
-        <div>
-          <span id="userBadge"></span>
-          <button class="warn" onclick="sair()">Sair</button>
-        </div>
-      </div>
+    <div class="container wrap">
+      <h2>Cadastro Local Avançado</h2>
+      <input id="cadNome" placeholder="Nome">
+      <input id="cadSobrenome" placeholder="Sobrenome">
+      <input id="cadEmail" placeholder="Email">
+      <button onclick="salvar()">💾 Salvar</button>
+      <button onclick="apagarTudo()">🗑️ Apagar todos</button>
+      <button onclick="exportarTXT()">💾 Exportar TXT</button>
+      <button onclick="exportarExcel()">📊 Exportar Excel</button>
 
-      <!-- Formulário do Cadastro (mesmo layout que você enviou) -->
-      <div style="margin-top:12px;">
-        <input id="cNome" placeholder="Nome" />
-        <input id="cSobrenome" placeholder="Sobrenome" />
-        <input id="cEmail" placeholder="Email" type="email" />
-        <button onclick="adicionarRegistro()">💾 Salvar</button>
-        <button class="warn" onclick="apagarTudo()">🗑️ Apagar todos</button>
-        <button class="secondary" onclick="escolherPasta()">📁 Escolher pasta</button>
-        <button onclick="exportarTXT()">💾 Exportar TXT</button>
-        <button onclick="exportarExcel()">📊 Exportar Excel</button>
-        <p id="mainMsg" class="msg"></p>
-      </div>
-
-      <!-- Tabela -->
       <table id="tabela">
         <thead>
           <tr>
@@ -108,25 +186,61 @@
         <tbody></tbody>
       </table>
     </div>
-
   </div>
 
   <script>
-    /************************************************************************
-     * Estrutura de armazenamento
-     * - usuarios: array de { nome, email, senha } (localStorage key "usuarios")
-     * - usuarioLogado: objeto user (localStorage key "usuarioLogado")
-     * - cadastros por usuário: key "cadastros_<safeEmail>" -> array de registros
-     *
-     * Cada usuário vê apenas seus cadastros.
-     ************************************************************************/
+    // LOGIN & REGISTRO
+    const loginRegistro = document.getElementById("loginRegistro");
+    const areaPrincipal = document.getElementById("areaPrincipal");
 
-    // ---------- Helpers ----------
-    function safeKeyForEmail(email){
-      // transforma e-mail em chave segura para localStorage
-      return 'cadastros_' + encodeURIComponent(email.toLowerCase());
+    function mostrarLogin() {
+      document.getElementById("tituloForm").innerText = "Login";
+      document.querySelector(".campo-registro").style.display = "none";
+      document.querySelector("button[onclick='registrar()']").innerText = "Entrar";
+      document.querySelector("button[onclick='registrar()']").setAttribute("onclick", "login()");
     }
 
+    function mostrarRegistro() {
+      document.getElementById("tituloForm").innerText = "Registrar";
+      document.querySelector(".campo-registro").style.display = "block";
+      document.querySelector("button[onclick='login()']").innerText = "Criar conta";
+      document.querySelector("button[onclick='login()']").setAttribute("onclick", "registrar()");
+    }
+
+    function registrar() {
+      const nome = document.getElementById("nome").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const senha = document.getElementById("senha").value.trim();
+      if (!nome || !email || !senha) return alert("Preencha todos os campos!");
+
+      const usuarios = JSON.parse(localStorage.getItem("usuariosLogin")) || [];
+      if (usuarios.find(u => u.email === email)) return alert("E-mail já registrado.");
+
+      usuarios.push({ nome, email, senha });
+      localStorage.setItem("usuariosLogin", JSON.stringify(usuarios));
+      alert("Registrado com sucesso!");
+      mostrarLogin();
+    }
+
+    function login() {
+      const email = document.getElementById("email").value.trim();
+      const senha = document.getElementById("senha").value.trim();
+      const usuarios = JSON.parse(localStorage.getItem("usuariosLogin")) || [];
+      const usuario = usuarios.find(u => u.email === email && u.senha === senha);
+      if (!usuario) return alert("Credenciais inválidas.");
+
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+      mostrarSistema();
+    }
+
+    function sair() {
+      localStorage.removeItem("usuarioLogado");
+      areaPrincipal.classList.add("hidden");
+      loginRegistro.classList.remove("hidden");
+      mostrarLogin();
+    }
+
+    // CADASTRO LOCAL AVANÇADO
     function gerarUUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
         const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -134,322 +248,160 @@
       });
     }
 
-    // pastaHandle (API File System) - sessão (não persistimos entre reloads)
-    let pastaHandle = null;
+    function salvar() {
+      const nome = document.getElementById("cadNome").value.trim();
+      const sobrenome = document.getElementById("cadSobrenome").value.trim();
+      const email = document.getElementById("cadEmail").value.trim();
+      if (!nome || !sobrenome || !email) return alert("Preencha todos os campos!");
 
-    // ---------- AUTENTICAÇÃO (localStorage) ----------
-    function mostrarRegistro(){
-      document.getElementById('registerView').classList.remove('hidden');
-      document.getElementById('loginView').classList.add('hidden');
-      document.getElementById('authTitle').textContent = 'Registrar';
-      clearMsgs();
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+      const chave = "cadastros_" + usuario.email;
+
+      let lista = JSON.parse(localStorage.getItem(chave)) || [];
+      lista.push({ uuid: gerarUUID(), nome, sobrenome, email });
+      localStorage.setItem(chave, JSON.stringify(lista));
+      mostrar();
+
+      document.getElementById("cadNome").value = "";
+      document.getElementById("cadSobrenome").value = "";
+      document.getElementById("cadEmail").value = "";
     }
 
-    function mostrarLogin(){
-      document.getElementById('registerView').classList.add('hidden');
-      document.getElementById('loginView').classList.remove('hidden');
-      document.getElementById('authTitle').textContent = 'Login';
-      clearMsgs();
-    }
+    function mostrar() {
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+      const chave = "cadastros_" + usuario.email;
+      const lista = JSON.parse(localStorage.getItem(chave)) || [];
+      const tbody = document.querySelector("#tabela tbody");
+      tbody.innerHTML = "";
 
-    function clearMsgs(){
-      document.getElementById('regMsg').textContent = '';
-      document.getElementById('logMsg').textContent = '';
-      document.getElementById('mainMsg').textContent = '';
-    }
-
-    function registrar(){
-      const nome = document.getElementById('regNome').value.trim();
-      const email = document.getElementById('regEmail').value.trim().toLowerCase();
-      const senha = document.getElementById('regSenha').value;
-      const senhaConf = document.getElementById('regSenhaConf').value;
-      const msg = document.getElementById('regMsg');
-
-      if(!nome || !email || !senha || !senhaConf){
-        msg.style.color='red'; msg.textContent='Preencha todos os campos!';
-        return;
-      }
-      if(senha.length < 4){
-        msg.style.color='red'; msg.textContent='Senha muito curta (mínimo 4 caracteres)!';
-        return;
-      }
-      if(senha !== senhaConf){
-        msg.style.color='red'; msg.textContent='As senhas não coincidem!';
-        return;
-      }
-
-      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-      if(usuarios.find(u => u.email === email)){
-        msg.style.color='red'; msg.textContent='E-mail já cadastrado!';
-        return;
-      }
-
-      usuarios.push({ nome, email, senha });
-      localStorage.setItem('usuarios', JSON.stringify(usuarios));
-      msg.style.color='green'; msg.textContent='Conta criada! Você já pode entrar.';
-      // limpa campos
-      document.getElementById('regNome').value='';
-      document.getElementById('regEmail').value='';
-      document.getElementById('regSenha').value='';
-      document.getElementById('regSenhaConf').value='';
-      setTimeout(mostrarLogin, 900);
-    }
-
-    function entrar(){
-      const email = document.getElementById('logEmail').value.trim().toLowerCase();
-      const senha = document.getElementById('logSenha').value;
-      const msg = document.getElementById('logMsg');
-
-      if(!email || !senha){
-        msg.style.color='red'; msg.textContent='Preencha e-mail e senha!';
-        return;
-      }
-
-      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-      const user = usuarios.find(u => u.email === email && u.senha === senha);
-      if(!user){
-        msg.style.color='red'; msg.textContent='E-mail ou senha incorretos!';
-        return;
-      }
-
-      localStorage.setItem('usuarioLogado', JSON.stringify(user));
-      // preparar pastaHandle como nulo (usuário pode escolher depois)
-      pastaHandle = null;
-      mostrarAreaUsuario();
-    }
-
-    function sair(){
-      localStorage.removeItem('usuarioLogado');
-      // limpa pasta temporária
-      pastaHandle = null;
-      document.getElementById('mainCard').classList.add('hidden');
-      document.getElementById('authCard').classList.remove('hidden');
-      mostrarLogin();
-    }
-
-    // ---------- ÁREA PRINCIPAL: CRUD (por usuário) ----------
-    function getUsuarioLogado(){
-      return JSON.parse(localStorage.getItem('usuarioLogado'));
-    }
-
-    function carregarCadastros(){
-      const u = getUsuarioLogado();
-      if(!u) return [];
-      const key = safeKeyForEmail(u.email);
-      return JSON.parse(localStorage.getItem(key)) || [];
-    }
-
-    function salvarCadastros(lista){
-      const u = getUsuarioLogado();
-      if(!u) return;
-      const key = safeKeyForEmail(u.email);
-      localStorage.setItem(key, JSON.stringify(lista));
-      // se pasta escolhida, atualiza arquivos também
-      if(pastaHandle) {
-        salvarArquivo('usuarios.json', JSON.stringify(lista, null, 2));
-        salvarArquivo('usuarios.txt', gerarTXT(lista));
-      }
-    }
-
-    function mostrarTabela(){
-      const lista = carregarCadastros();
-      const tbody = document.querySelector('#tabela tbody');
-      tbody.innerHTML = '';
       lista.forEach(item => {
-        const tr = document.createElement('tr');
+        const tr = document.createElement("tr");
 
-        const tdUUID = document.createElement('td'); tdUUID.textContent = item.uuid; tr.appendChild(tdUUID);
+        const tdUUID = document.createElement("td");
+        tdUUID.textContent = item.uuid;
+        tdUUID.setAttribute("data-label", "UUID");
+        tr.appendChild(tdUUID);
 
-        const tdNome = document.createElement('td');
-        const inputNome = document.createElement('input'); inputNome.value = item.nome;
+        const tdNome = document.createElement("td");
+        const inputNome = document.createElement("input");
+        inputNome.value = item.nome;
         inputNome.onchange = () => atualizarCampo(item.uuid, 'nome', inputNome.value);
-        tdNome.appendChild(inputNome); tr.appendChild(tdNome);
+        tdNome.appendChild(inputNome);
+        tdNome.setAttribute("data-label", "Nome");
+        tr.appendChild(tdNome);
 
-        const tdSob = document.createElement('td');
-        const inputSob = document.createElement('input'); inputSob.value = item.sobrenome;
+        const tdSobrenome = document.createElement("td");
+        const inputSob = document.createElement("input");
+        inputSob.value = item.sobrenome;
         inputSob.onchange = () => atualizarCampo(item.uuid, 'sobrenome', inputSob.value);
-        tdSob.appendChild(inputSob); tr.appendChild(tdSob);
+        tdSobrenome.appendChild(inputSob);
+        tdSobrenome.setAttribute("data-label", "Sobrenome");
+        tr.appendChild(tdSobrenome);
 
-        const tdEmail = document.createElement('td');
-        const inputEmail = document.createElement('input'); inputEmail.value = item.email;
+        const tdEmail = document.createElement("td");
+        const inputEmail = document.createElement("input");
+        inputEmail.value = item.email;
         inputEmail.onchange = () => atualizarCampo(item.uuid, 'email', inputEmail.value);
-        tdEmail.appendChild(inputEmail); tr.appendChild(tdEmail);
+        tdEmail.appendChild(inputEmail);
+        tdEmail.setAttribute("data-label", "Email");
+        tr.appendChild(tdEmail);
 
-        const tdAcoes = document.createElement('td');
-        const btnAlterar = document.createElement('button'); btnAlterar.textContent='Alterar'; btnAlterar.className='secondary';
-        btnAlterar.onclick = () => atualizarRegistro(item.uuid);
-        tdAcoes.appendChild(btnAlterar);
-
-        const btnApagar = document.createElement('button'); btnApagar.textContent='Apagar'; btnApagar.className='warn';
-        btnApagar.onclick = () => apagar(item.uuid);
-        tdAcoes.appendChild(btnApagar);
-
+        const tdAcoes = document.createElement("td");
+        tdAcoes.setAttribute("data-label", "Ações");
+        const btnAlt = document.createElement("button");
+        btnAlt.textContent = "Alterar";
+        btnAlt.onclick = () => atualizarRegistro(item.uuid);
+        const btnDel = document.createElement("button");
+        btnDel.textContent = "Apagar";
+        btnDel.onclick = () => apagar(item.uuid);
+        tdAcoes.append(btnAlt, btnDel);
         tr.appendChild(tdAcoes);
+
         tbody.appendChild(tr);
       });
     }
 
-    function adicionarRegistro(){
-      const nome = document.getElementById('cNome').value.trim();
-      const sobrenome = document.getElementById('cSobrenome').value.trim();
-      const email = document.getElementById('cEmail').value.trim();
-      const msg = document.getElementById('mainMsg');
-
-      if(!nome || !sobrenome || !email){
-        msg.style.color='red'; msg.textContent='Preencha todos os campos!';
-        return;
-      }
-
-      const lista = carregarCadastros();
-      const uuid = gerarUUID();
-      const dados = { uuid, nome, sobrenome, email };
-      lista.push(dados);
-      salvarCadastros(lista);
-      mostrarTabela();
-      msg.style.color='green'; msg.textContent='Registro salvo!';
-      document.getElementById('cNome').value=''; document.getElementById('cSobrenome').value=''; document.getElementById('cEmail').value='';
-      setTimeout(()=> msg.textContent='',1200);
+    function atualizarCampo(uuid, campo, valor) {
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+      const chave = "cadastros_" + usuario.email;
+      let lista = JSON.parse(localStorage.getItem(chave)) || [];
+      const item = lista.find(u => u.uuid === uuid);
+      if (!item) return;
+      item[campo] = valor;
+      localStorage.setItem(chave, JSON.stringify(lista));
     }
 
-    async function atualizarCampo(uuid, campo, valor){
-      let lista = carregarCadastros();
-      const item = lista.find(i => i.uuid === uuid);
-      if(!item) return;
-      item[campo] = valor.trim();
-      salvarCadastros(lista);
+    function atualizarRegistro(uuid) {
+      alert("Registro atualizado!");
     }
 
-    async function atualizarRegistro(uuid){
-      let lista = carregarCadastros();
-      const item = lista.find(i => i.uuid === uuid);
-      if(!item) return;
-      // pega valores da linha
-      const tr = [...document.querySelectorAll('#tabela tbody tr')].find(r => r.firstChild.textContent === uuid);
-      if(!tr) return;
-      item.nome = tr.querySelector('td:nth-child(2) input').value.trim();
-      item.sobrenome = tr.querySelector('td:nth-child(3) input').value.trim();
-      item.email = tr.querySelector('td:nth-child(4) input').value.trim();
-      salvarCadastros(lista);
-      alert('Registro atualizado!');
+    function apagar(uuid) {
+      if (!confirm("Apagar este registro?")) return;
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+      const chave = "cadastros_" + usuario.email;
+      let lista = JSON.parse(localStorage.getItem(chave)) || [];
+      lista = lista.filter(item => item.uuid !== uuid);
+      localStorage.setItem(chave, JSON.stringify(lista));
+      mostrar();
     }
 
-    function apagar(uuid){
-      if(!confirm('Apagar este registro?')) return;
-      let lista = carregarCadastros();
-      lista = lista.filter(i => i.uuid !== uuid);
-      salvarCadastros(lista);
-      mostrarTabela();
+    function apagarTudo() {
+      if (!confirm("Apagar todos os registros?")) return;
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+      localStorage.setItem("cadastros_" + usuario.email, "[]");
+      mostrar();
     }
 
-    function apagarTudo(){
-      if(!confirm('Apagar todos os dados?')) return;
-      const u = getUsuarioLogado();
-      if(!u) return;
-      const key = safeKeyForEmail(u.email);
-      localStorage.setItem(key, JSON.stringify([]));
-      mostrarTabela();
-      // se pasta escolhida, atualiza arquivos
-      if(pastaHandle){
-        salvarArquivo('usuarios.json', '[]');
-        salvarArquivo('usuarios.txt', '[]');
-      }
-    }
-
-    function gerarTXT(lista){
+    function gerarTXT(lista) {
       let conteudo = "UUID\tNome\tSobrenome\tEmail\n";
-      lista.forEach(u => conteudo += `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}\n`);
+      lista.forEach(u => {
+        conteudo += `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}\n`;
+      });
       return conteudo;
     }
 
-    function exportarTXT(){
-      const lista = carregarCadastros();
-      if(lista.length === 0) { alert('Não há dados para exportar!'); return; }
-      const blob = new Blob([gerarTXT(lista)], { type: 'text/plain' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'usuarios.txt'; a.click();
+    function exportarTXT() {
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+      const lista = JSON.parse(localStorage.getItem("cadastros_" + usuario.email)) || [];
+      if (lista.length === 0) return alert("Sem dados!");
+      const blob = new Blob([gerarTXT(lista)], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "usuarios.txt";
+      a.click();
       URL.revokeObjectURL(a.href);
     }
 
-    function exportarExcel(){
-      const lista = carregarCadastros();
-      if(lista.length === 0) { alert('Não há dados para exportar!'); return; }
-      let csv = "UUID,Nome,Sobrenome,Email\n";
-      lista.forEach(u => csv += `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"\n`);
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'usuarios.csv'; a.click();
+    function exportarExcel() {
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+      const lista = JSON.parse(localStorage.getItem("cadastros_" + usuario.email)) || [];
+      if (lista.length === 0) return alert("Sem dados!");
+      let conteudo = "UUID,Nome,Sobrenome,Email\n";
+      lista.forEach(u => {
+        conteudo += `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"\n`;
+      });
+      const blob = new Blob([conteudo], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "usuarios.csv";
+      a.click();
       URL.revokeObjectURL(a.href);
     }
 
-    // ---------- File System API (opcional) ----------
-    async function escolherPasta(){
-      if(!window.showDirectoryPicker){
-        alert('API de escolha de pasta não suportada neste navegador.');
-        return;
-      }
-      try{
-        pastaHandle = await window.showDirectoryPicker();
-        alert('Pasta selecionada com sucesso!');
-        // tenta carregar arquivo usuarios.json caso exista (sob chave desta pasta, mas cuidado: carregamos só se o arquivo existir)
-        await carregarArquivo();
-      }catch(err){
-        console.warn('Escolha de pasta cancelada/erro', err);
-        pastaHandle = null;
-      }
+    // Mostrar sistema após login
+    function mostrarSistema() {
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+      document.getElementById("usuarioAtual").textContent = usuario.nome;
+      loginRegistro.classList.add("hidden");
+      areaPrincipal.classList.remove("hidden");
+      mostrar();
     }
 
-    async function salvarArquivo(nomeArquivo, conteudo){
-      if(!pastaHandle) return;
-      try{
-        const fileHandle = await pastaHandle.getFileHandle(nomeArquivo, { create: true });
-        const writable = await fileHandle.createWritable();
-        await writable.write(conteudo);
-        await writable.close();
-      }catch(err){
-        console.error('Erro ao salvar arquivo:', err);
-      }
-    }
-
-    async function carregarArquivo(){
-      if(!pastaHandle) return;
-      try{
-        const fileHandle = await pastaHandle.getFileHandle('usuarios.json');
-        const file = await fileHandle.getFile();
-        const texto = await file.text();
-        // salvar no localStorage do usuário atual (sobrescreve)
-        const u = getUsuarioLogado();
-        if(!u) return;
-        const key = safeKeyForEmail(u.email);
-        localStorage.setItem(key, texto);
-        mostrarTabela();
-        alert('Arquivo usuarios.json carregado para seus cadastros.');
-      }catch(err){
-        console.warn('Arquivo usuarios.json não encontrado ou erro:', err);
-      }
-    }
-
-    // ---------- Inicialização: verifica login ----------
-    function mostrarAreaUsuario(){
-      const u = getUsuarioLogado();
-      if(!u) return;
-      document.getElementById('authCard').classList.add('hidden');
-      document.getElementById('mainCard').classList.remove('hidden');
-      document.getElementById('userBadge').textContent = u.nome + ' (' + u.email + ')';
-      mostrarTabela();
-    }
-
-    window.addEventListener('load', () => {
-      const u = getUsuarioLogado();
-      if(u){
-        mostrarAreaUsuario();
-      } else {
-        mostrarRegistro();
-      }
-    });
-
-    // Segurança leve (opcional): limpar dados sensíveis do DOM quando sair da página
-    window.addEventListener('beforeunload', () => {
-      // NÃO removemos usuários nem cadastros — apenas limpamos variáveis temporárias
-      pastaHandle = null;
-    });
+    window.onload = () => {
+      const logado = localStorage.getItem("usuarioLogado");
+      if (logado) mostrarSistema();
+      else mostrarRegistro();
+    };
   </script>
 </body>
 </html>
