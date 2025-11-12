@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro Local Avançado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+    }
+    h2 { text-align: center; }
+    input { padding: 5px; margin: 5px; width: 200px; }
+    button { padding: 5px 10px; margin: 5px; cursor: pointer; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even){background-color: #f2f2f2;}
+    tr:hover {background-color: #ddd;}
+    td input { width: 90%; padding: 4px; }
+
+    /* Botões dentro da célula */
+    td button {
+      padding: 5px 10px;
+      margin: 2px;
+      border: none;
+      border-radius: 4px;
+      color: white;
+    }
+    td button:first-child { background: #2196F3; } /* Alterar */
+    td button:last-child { background: #f44336; }  /* Apagar */
+
+    /* Responsividade para celular */
+    @media (max-width: 600px) {
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      input {
+        width: 100%;
+      }
+      button {
+        width: 100%;
+        margin: 3px 0;
+      }
+      td button {
+        display: inline-block;
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Cadastro Local com Edição Inline</h2>
+
+  <div>
+    <input id="nome" placeholder="Nome">
+    <input id="sobrenome" placeholder="Sobrenome">
+    <input id="email" placeholder="Email">
+    <button onclick="salvar()">💾 Salvar</button>
+    <button onclick="apagarTudo()">🗑️ Apagar todos</button>
+    <button onclick="escolherPasta()">📁 Escolher pasta</button>
+    <button onclick="exportarTXT()">💾 Exportar TXT</button>
+    <button onclick="exportarExcel()">📊 Exportar Excel</button>
+  </div>
+
+  <table id="tabela">
+    <thead>
+      <tr>
+        <th>UUID</th>
+        <th>Nome</th>
+        <th>Sobrenome</th>
+        <th>Email</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    let pastaHandle = null;
+
+    function gerarUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    async function escolherPasta() {
+      try {
+        pastaHandle = await window.showDirectoryPicker();
+        alert("Pasta selecionada com sucesso!");
+        await carregarArquivo();
+      } catch {
+        alert("Permissão negada ou cancelada.");
+      }
+    }
+
+    async function salvar() {
+      const nome = document.getElementById("nome").value.trim();
+      const sobrenome = document.getElementById("sobrenome").value.trim();
+      const email = document.getElementById("email").value.trim();
+      if (!nome || !sobrenome || !email) return alert("Preencha todos os campos!");
+
+      const uuid = gerarUUID();
+      const dados = { uuid, nome, sobrenome, email };
+
+      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      lista.push(dados);
+      localStorage.setItem("usuarios", JSON.stringify(lista));
+      mostrar();
+
+      if (pastaHandle) {
+        await salvarArquivo("usuarios.json", JSON.stringify(lista, null, 2));
+        await salvarArquivo("usuarios.txt", gerarTXT(lista));
+      }
+
+      document.getElementById("nome").value = "";
+      document.getElementById("sobrenome").value = "";
+      document.getElementById("email").value = "";
+    }
+
+    function mostrar() {
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      const tbody = document.querySelector("#tabela tbody");
+      tbody.innerHTML = "";
+
+      lista.forEach(item => {
+        const tr = document.createElement("tr");
+
+        const tdUUID = document.createElement("td");
+        tdUUID.textContent = item.uuid;
+        tr.appendChild(tdUUID);
+
+        const tdNome = document.createElement("td");
+        const inputNome = document.createElement("input");
+        inputNome.value = item.nome;
+        inputNome.onchange = () => atualizarCampo(item.uuid, 'nome', inputNome.value);
+        tdNome.appendChild(inputNome);
+        tr.appendChild(tdNome);
+
+        const tdSobrenome = document.createElement("td");
+        const inputSob = document.createElement("input");
+        inputSob.value = item.sobrenome;
+        inputSob.onchange = () => atualizarCampo(item.uuid, 'sobrenome', inputSob.value);
+        tdSobrenome.appendChild(inputSob);
+        tr.appendChild(tdSobrenome);
+
+        const tdEmail = document.createElement("td");
+        const inputEmail = document.createElement("input");
+        inputEmail.value = item.email;
+        inputEmail.onchange = () => atualizarCampo(item.uuid, 'email', inputEmail.value);
+        tdEmail.appendChild(inputEmail);
+        tr.appendChild(tdEmail);
+
+        const tdAcoes = document.createElement("td");
+        const btnAlterar = document.createElement("button");
+        btnAlterar.textContent = "Alterar";
+        btnAlterar.onclick = () => atualizarRegistro(item.uuid);
+        tdAcoes.appendChild(btnAlterar);
+
+        const btnApagar = document.createElement("button");
+        btnApagar.textContent = "Apagar";
+        btnApagar.onclick = () => apagar(item.uuid);
+        tdAcoes.appendChild(btnApagar);
+
+        tr.appendChild(tdAcoes);
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function atualizarCampo(uuid, campo, valor) {
+      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      const item = lista.find(u => u.uuid === uuid);
+      if (!item) return;
+      item[campo] = valor.trim();
+      localStorage.setItem("usuarios", JSON.stringify(lista));
+      if (pastaHandle) {
+        await salvarArquivo("usuarios.json", JSON.stringify(lista, null, 2));
+        await salvarArquivo("usuarios.txt", gerarTXT(lista));
+      }
+    }
+
+    async function atualizarRegistro(uuid) {
+      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      const item = lista.find(u => u.uuid === uuid);
+      if (!item) return;
+
+      const tr = [...document.querySelectorAll("#tabela tbody tr")]
+                  .find(r => r.firstChild.textContent === uuid);
+      if (!tr) return;
+
+      item.nome = tr.querySelector("td:nth-child(2) input").value.trim();
+      item.sobrenome = tr.querySelector("td:nth-child(3) input").value.trim();
+      item.email = tr.querySelector("td:nth-child(4) input").value.trim();
+
+      localStorage.setItem("usuarios", JSON.stringify(lista));
+      if (pastaHandle) {
+        await salvarArquivo("usuarios.json", JSON.stringify(lista, null, 2));
+        await salvarArquivo("usuarios.txt", gerarTXT(lista));
+      }
+      alert("Registro atualizado!");
+    }
+
+    async function apagar(uuid) {
+      if (!confirm("Apagar este registro?")) return;
+      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      lista = lista.filter(item => item.uuid !== uuid);
+      localStorage.setItem("usuarios", JSON.stringify(lista));
+      mostrar();
+
+      if (pastaHandle) {
+        await salvarArquivo("usuarios.json", JSON.stringify(lista, null, 2));
+        await salvarArquivo("usuarios.txt", gerarTXT(lista));
+      }
+    }
+
+    async function apagarTudo() {
+      if (!confirm("Apagar todos os dados?")) return;
+      localStorage.removeItem("usuarios");
+      mostrar();
+
+      if (pastaHandle) {
+        await salvarArquivo("usuarios.json", "[]");
+        await salvarArquivo("usuarios.txt", "[]");
+      }
+    }
+
+    function gerarTXT(lista) {
+      let conteudo = "UUID\tNome\tSobrenome\tEmail\n";
+      lista.forEach(u => {
+        conteudo += `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}\n`;
+      });
+      return conteudo;
+    }
+
+    async function exportarTXT() {
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      if (lista.length === 0) return alert("Não há dados para exportar!");
+
+      const blob = new Blob([gerarTXT(lista)], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "usuarios.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function exportarExcel() {
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      if (lista.length === 0) return alert("Não há dados para exportar!");
+
+      let conteudo = "UUID,Nome,Sobrenome,Email\n";
+      lista.forEach(u => {
+        conteudo += `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"\n`;
+      });
+
+      const blob = new Blob([conteudo], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "usuarios.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function salvarArquivo(nomeArquivo, conteudo) {
+      if (!pastaHandle) return;
+      try {
+        const fileHandle = await pastaHandle.getFileHandle(nomeArquivo, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(conteudo);
+        await writable.close();
+      } catch (err) {
+        console.error("Erro ao salvar arquivo:", err);
+      }
+    }
+
+    async function carregarArquivo() {
+      if (!pastaHandle) return;
+      try {
+        const fileHandle = await pastaHandle.getFileHandle("usuarios.json");
+        const file = await fileHandle.getFile();
+        const texto = await file.text();
+        localStorage.setItem("usuarios", texto);
+        mostrar();
+      } catch (err) {
+        console.warn("Arquivo não encontrado ou erro ao carregar:", err);
+      }
+    }
+
+    // Inicializa a tabela ao carregar a página
+    mostrar();
+  </script>
+</body>
+</html>
