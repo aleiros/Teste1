@@ -1,413 +1,453 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Cadastro Local Avançado</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sistema Local - Cadastro Avançado (PDF por linha + Geral)</title>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
-    /* =======================
-       ESTILO GLOBAL MODERNO
-    ======================== */
-    * {
-      box-sizing: border-box;
-      transition: all 0.2s ease;
+    :root{
+      --primary:#2b6ef6;
+      --accent:#06b6d4;
+      --danger:#ef4444;
+      --muted:#6b7280;
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --radius:12px;
+      --shadow: 0 8px 30px rgba(15,23,42,0.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Arial,sans-serif;
+      background:var(--bg);
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+      display:flex;
+      justify-content:center;
     }
 
-    body {
-      font-family: "Inter", Arial, sans-serif;
-      margin: 0;
-      background: linear-gradient(135deg, #f8fafc, #eef2f3);
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+    .app{
+      width:100%;
+      max-width:1100px;
     }
 
-    h2 {
-      text-align: center;
-      color: #1f2937;
-      margin-bottom: 20px;
+    /* top nav */
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+    .brand{font-weight:700;color:var(--primary);font-size:18px}
+    .nav .actions{display:flex;gap:8px;align-items:center}
+    .pill{
+      padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--accent));color:white;border:none;cursor:pointer;font-weight:600;
+      box-shadow: 0 6px 18px rgba(43,110,246,0.12);
+    }
+    .ghost{background:transparent;border:1px solid rgba(15,23,42,0.06);padding:8px 12px;border-radius:10px;cursor:pointer}
+
+    /* layout */
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
     }
 
-    .container {
-      width: 100%;
-      max-width: 900px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-      padding: 25px;
-      margin-bottom: 40px;
+    /* auth */
+    .auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .auth-grid .col{padding:12px}
+    .label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
+    input[type="text"], input[type="email"], input[type="password"]{
+      width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef9;background:#fbfdff;
+    }
+    .btn{
+      display:inline-block;padding:10px 14px;border-radius:10px;border:none;background:var(--primary);color:white;font-weight:700;cursor:pointer;
+    }
+    .btn.warn{background:var(--danger)}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* controls row */
+    .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    .controls .input{flex:1;min-width:180px}
+    .controls button{min-width:140px}
+
+    /* search */
+    .search{display:flex;gap:8px;align-items:center;margin-top:12px}
+    .search input{flex:1;padding:10px;border-radius:10px;border:1px solid #e6eef9;background:#fff}
+
+    /* table */
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    thead th{background:linear-gradient(90deg,var(--primary),var(--accent));color:white;padding:12px;text-align:left;font-weight:700}
+    th,td{padding:12px;border-bottom:1px solid #f1f5f9}
+    td input{width:100%;padding:8px;border-radius:8px;border:1px solid #eef2ff;background:transparent}
+    .row-actions{display:flex;gap:6px;align-items:center}
+    .action-btn{padding:8px 10px;border-radius:8px;border:none;color:white;cursor:pointer;font-weight:700}
+    .action-btn.pdf{background:linear-gradient(90deg,#7c3aed,#c026d3)}
+    .action-btn.del{background:var(--danger)}
+    .action-btn.save{background:#16a34a}
+
+    /* mobile cards */
+    @media(max-width:800px){
+      .auth-grid{grid-template-columns:1fr; }
+      table, thead, tbody, th, td, tr { display:block; width:100%;}
+      thead{display:none}
+      tr{background:var(--card);border-radius:10px;margin-bottom:12px;padding:12px;box-shadow:var(--shadow)}
+      td{display:flex;justify-content:space-between;align-items:center;border:none;padding:8px 6px}
+      td .left{flex:1}
+      td .label-mobile{font-weight:700;color:var(--muted);margin-right:8px}
+      td:not(:last-child){border-bottom:1px solid #f3f5f9}
+      .controls{flex-direction:column}
+      .controls .input{width:100%}
     }
 
-    /* =======================
-       LOGIN / REGISTRO
-    ======================== */
-    .login-section {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .login-section input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    .login-section button {
-      width: 100%;
-      padding: 12px;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .login-section button:hover {
-      background: #1e40af;
-    }
-
-    .toggle {
-      color: #2563eb;
-      font-size: 14px;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    /* =======================
-       ÁREA DE CADASTRO
-    ======================== */
-    .input-area input {
-      padding: 10px;
-      margin: 5px;
-      width: calc(33% - 10px);
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .input-area button {
-      padding: 10px 16px;
-      margin: 5px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #22c55e;
-      color: #fff;
-      font-weight: 600;
-    }
-
-    .input-area button:hover {
-      background: #16a34a;
-    }
-
-    .export-buttons {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .export-buttons button {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .btn-txt { background: #6366f1; }
-    .btn-txt:hover { background: #4f46e5; }
-    .btn-excel { background: #10b981; }
-    .btn-excel:hover { background: #059669; }
-    .btn-pdf { background: #ef4444; }
-    .btn-pdf:hover { background: #b91c1c; }
-
-    /* =======================
-       CAMPO DE BUSCA
-    ======================== */
-    .search-bar {
-      margin: 15px 0;
-      text-align: center;
-    }
-
-    .search-bar input {
-      width: 90%;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #bbb;
-      font-size: 16px;
-    }
-
-    /* =======================
-       TABELA ESTILIZADA
-    ======================== */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      overflow: hidden;
-      border-radius: 10px;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 12px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    th {
-      background: #2563eb;
-      color: #fff;
-      font-weight: 600;
-    }
-
-    tr:hover {
-      background: #f1f5f9;
-    }
-
-    td input {
-      width: 100%;
-      border: none;
-      background: transparent;
-      padding: 4px;
-      font-size: 14px;
-    }
-
-    /* =======================
-       BOTÕES DENTRO DA TABELA
-    ======================== */
-    td button {
-      border: none;
-      padding: 6px 10px;
-      border-radius: 5px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 13px;
-      margin-right: 4px;
-    }
-
-    .btn-edit {
-      background: #3b82f6;
-    }
-
-    .btn-edit:hover {
-      background: #1d4ed8;
-    }
-
-    .btn-delete {
-      background: #ef4444;
-    }
-
-    .btn-delete:hover {
-      background: #b91c1c;
-    }
-
-    /* =======================
-       RESPONSIVIDADE
-    ======================== */
-    @media (max-width: 768px) {
-      .input-area input {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-
-      th, td {
-        padding: 10px 8px;
-      }
-
-      .login-section button {
-        font-size: 15px;
-      }
-    }
+    /* footer small */
+    .meta{font-size:13px;color:var(--muted);margin-top:8px}
   </style>
 </head>
 <body>
-  <div class="container" id="loginContainer">
-    <h2 id="loginTitle">Entrar</h2>
-    <div class="login-section">
-      <input id="loginEmail" type="email" placeholder="Email">
-      <input id="loginSenha" type="password" placeholder="Senha">
-      <button onclick="entrar()">Entrar</button>
-      <p class="toggle" onclick="alternar()">Não tem conta? Registrar</p>
-    </div>
-  </div>
+  <div class="app">
 
-  <div class="container" id="cadastroContainer" style="display:none;">
-    <h2>Cadastro Local Avançado</h2>
-
-    <div class="input-area">
-      <input id="nome" placeholder="Nome">
-      <input id="sobrenome" placeholder="Sobrenome">
-      <input id="email" placeholder="Email">
-      <button onclick="salvar()">💾 Salvar</button>
+    <!-- NAV -->
+    <div class="nav">
+      <div class="brand">Sistema Local — Cadastros</div>
+      <div class="actions">
+        <button id="btnNew" class="ghost" onclick="mostrarRegister()">Registrar</button>
+        <button id="btnLogin" class="ghost" onclick="mostrarLogin()">Login</button>
+      </div>
     </div>
 
-    <div class="search-bar">
-      <input id="busca" type="text" placeholder="🔍 Buscar por nome, sobrenome ou email..." oninput="buscar()">
+    <!-- AUTH CARD -->
+    <div id="authCard" class="card">
+      <div id="authInner">
+        <!-- by default show register & login compact -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:260px">
+            <div class="label">Nome</div>
+            <input id="regNome" type="text" placeholder="Seu nome completo">
+            <div class="label" style="margin-top:8px">Email</div>
+            <input id="regEmail" type="email" placeholder="seu@exemplo.com">
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn" onclick="registrar()">Criar Conta</button>
+              <button class="ghost" onclick="mostrarLogin()">Já tenho conta</button>
+            </div>
+          </div>
+          <div style="flex:1;min-width:260px">
+            <div class="label">Login</div>
+            <input id="logEmail" type="email" placeholder="Email">
+            <div class="label" style="margin-top:8px">Senha</div>
+            <input id="logSenha" type="password" placeholder="Senha">
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn" onclick="entrar()">Entrar</button>
+              <button class="ghost" onclick="mostrarRegister()">Registrar</button>
+            </div>
+          </div>
+        </div>
+        <div class="meta">Os dados ficam no seu navegador (localStorage). Para testes use vários e-mails diferentes.</div>
+      </div>
     </div>
 
-    <table id="tabela">
-      <thead>
-        <tr>
-          <th>UUID</th>
-          <th>Nome</th>
-          <th>Sobrenome</th>
-          <th>Email</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <!-- MAIN APP CARD -->
+    <div id="appCard" class="card" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:800;font-size:18px">Cadastro Local Avançado</div>
+          <div class="small" id="userBadge">—</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="ghost" onclick="apagarConta()">Apagar conta</button>
+          <button class="pill" onclick="sair()">Sair</button>
+        </div>
+      </div>
 
-    <div class="export-buttons">
-      <button class="btn-txt" onclick="exportarTXT()">💾 TXT</button>
-      <button class="btn-excel" onclick="exportarExcel()">📊 Excel</button>
-      <button class="btn-pdf" onclick="exportarPDF()">📄 PDF</button>
+      <!-- inputs + actions -->
+      <div class="controls" style="margin-top:16px">
+        <input id="cNome" class="input" placeholder="Nome">
+        <input id="cSobrenome" class="input" placeholder="Sobrenome">
+        <input id="cEmail" class="input" placeholder="Email">
+        <button class="pill" onclick="adicionarRegistro()">💾 Salvar</button>
+        <button class="ghost" onclick="apagarTudo()">🗑️ Apagar todos</button>
+      </div>
+
+      <div class="search" style="margin-top:14px">
+        <input id="searchInput" placeholder="🔍 Buscar por UUID, nome, sobrenome, email" oninput="mostrar()">
+        <div style="display:flex;gap:8px">
+          <button class="ghost" onclick="mostrar(true)">Limpar</button>
+          <button class="ghost" onclick="mostrar(true); document.getElementById('searchInput').value='';">Atualizar</button>
+        </div>
+      </div>
+
+      <!-- table -->
+      <div style="overflow:auto;margin-top:14px">
+        <table id="tabela">
+          <thead>
+            <tr>
+              <th>UUID</th>
+              <th>Nome</th>
+              <th>Sobrenome</th>
+              <th>Email</th>
+              <th style="width:210px">Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- export -->
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
+        <button class="btn-txt ghost" onclick="exportarTXT()">Exportar TXT</button>
+        <button class="btn-excel ghost" onclick="exportarCSV()">Exportar Excel (CSV)</button>
+        <button class="btn-pdf ghost" onclick="exportarPDFGeral()">Exportar PDF Geral</button>
+      </div>
+
+      <div class="meta">Cada linha tem botão PDF individual — gera PDF somente daquele registro.</div>
     </div>
   </div>
 
   <script>
-    function alternar() {
-      const title = document.getElementById("loginTitle");
-      const btn = document.querySelector(".login-section button");
-      const toggle = document.querySelector(".toggle");
-
-      if (title.textContent === "Entrar") {
-        title.textContent = "Registrar";
-        btn.textContent = "Registrar";
-        toggle.textContent = "Já tem conta? Entrar";
-      } else {
-        title.textContent = "Entrar";
-        btn.textContent = "Entrar";
-        toggle.textContent = "Não tem conta? Registrar";
-      }
-    }
-
-    function entrar() {
-      document.getElementById("loginContainer").style.display = "none";
-      document.getElementById("cadastroContainer").style.display = "block";
-    }
-
-    function gerarUUID() {
-      return 'xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, c => {
-        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    /* ====== Helpers ====== */
+    const pdfLogoBase64 = ''; // coloque base64 se quiser logo no cabeçalho do PDF
+    function safeKey(email){ return 'cadastros_' + encodeURIComponent(email.toLowerCase()); }
+    function gerarUUID(){
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{
+        const r = Math.random()*16|0, v = c==='x'? r : (r&0x3|0x8);
         return v.toString(16);
       });
     }
+    function nowReadable(){ return new Date().toLocaleString(); }
 
-    function salvar() {
-      const nome = nomeEl.value.trim();
-      const sobrenome = sobrenomeEl.value.trim();
-      const email = emailEl.value.trim();
-
-      if (!nome || !sobrenome || !email) return alert("Preencha todos os campos!");
-      const uuid = gerarUUID();
-
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      lista.push({ uuid, nome, sobrenome, email });
-      localStorage.setItem("usuarios", JSON.stringify(lista));
-      mostrar();
-      nomeEl.value = sobrenomeEl.value = emailEl.value = "";
+    /* ====== AUTH / SESSÃO ====== */
+    function registrar(){
+      const nome = document.getElementById('regNome').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      if(!email || !nome) return alert('Preencha nome e email para registrar.');
+      let users = JSON.parse(localStorage.getItem('usuarios'))||[];
+      if(users.find(u=>u.email===email)) return alert('E-mail já registrado.');
+      // senha opcional aqui — para simplicidade não exigimos senha no registro compacto
+      users.push({ nome, email, senha: '' });
+      localStorage.setItem('usuarios', JSON.stringify(users));
+      alert('Conta criada. Faça login.');
     }
 
-    const nomeEl = document.getElementById("nome");
-    const sobrenomeEl = document.getElementById("sobrenome");
-    const emailEl = document.getElementById("email");
+    function mostrarLogin(){ document.getElementById('authCard').style.display='block'; }
+    function mostrarRegister(){ document.getElementById('authCard').style.display='block'; }
 
-    function mostrar(filtro = "") {
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const tbody = document.querySelector("#tabela tbody");
-      tbody.innerHTML = "";
-
-      lista
-        .filter(u =>
-          u.nome.toLowerCase().includes(filtro) ||
-          u.sobrenome.toLowerCase().includes(filtro) ||
-          u.email.toLowerCase().includes(filtro)
-        )
-        .forEach(item => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${item.uuid}</td>
-            <td><input value="${item.nome}" onchange="atualizar('${item.uuid}','nome',this.value)"></td>
-            <td><input value="${item.sobrenome}" onchange="atualizar('${item.uuid}','sobrenome',this.value)"></td>
-            <td><input value="${item.email}" onchange="atualizar('${item.uuid}','email',this.value)"></td>
-            <td>
-              <button class="btn-edit" onclick="alert('Editado!')">Editar</button>
-              <button class="btn-delete" onclick="apagar('${item.uuid}')">Apagar</button>
-            </td>`;
-          tbody.appendChild(tr);
-        });
+    function entrar(){
+      const e = document.getElementById('logEmail').value.trim().toLowerCase();
+      const s = document.getElementById('logSenha').value;
+      const users = JSON.parse(localStorage.getItem('usuarios'))||[];
+      const user = users.find(u=>u.email===e);
+      if(!user) return alert('Usuário não encontrado. Registre primeiro.');
+      // aceitaremos qualquer senha (ou you can check) — simple local auth
+      localStorage.setItem('usuarioLogado', JSON.stringify(user));
+      iniciarSessao();
     }
 
-    function atualizar(uuid, campo, valor) {
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const item = lista.find(i => i.uuid === uuid);
-      if (item) item[campo] = valor;
-      localStorage.setItem("usuarios", JSON.stringify(lista));
-    }
-
-    function apagar(uuid) {
-      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      lista = lista.filter(i => i.uuid !== uuid);
-      localStorage.setItem("usuarios", JSON.stringify(lista));
+    function iniciarSessao(){
+      const u = JSON.parse(localStorage.getItem('usuarioLogado'));
+      if(!u) return;
+      document.getElementById('authCard').style.display='none';
+      document.getElementById('appCard').style.display='block';
+      document.getElementById('userBadge').textContent = u.nome + ' — ' + u.email;
       mostrar();
     }
 
-    function buscar() {
-      const termo = document.getElementById("busca").value.toLowerCase();
-      mostrar(termo);
+    function sair(){
+      localStorage.removeItem('usuarioLogado');
+      document.getElementById('appCard').style.display='none';
+      document.getElementById('authCard').style.display='block';
     }
 
-    // ===== EXPORTAÇÕES =====
-    function exportarTXT() {
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      let conteudo = "UUID\tNome\tSobrenome\tEmail\n";
-      lista.forEach(u => conteudo += `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}\n`);
-      const blob = new Blob([conteudo], { type: "text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "usuarios.txt";
-      a.click();
+    function apagarConta(){
+      if(!confirm('Apagar conta e todos os cadastros? Esta ação é irreversível.')) return;
+      const u = JSON.parse(localStorage.getItem('usuarioLogado'));
+      if(!u) return;
+      // remove user from global (optional)
+      let users = JSON.parse(localStorage.getItem('usuarios'))||[];
+      users = users.filter(x=>x.email !== u.email);
+      localStorage.setItem('usuarios', JSON.stringify(users));
+      // remove cadastros
+      localStorage.removeItem(safeKey(u.email));
+      sair();
+      alert('Conta removida.');
     }
 
-    function exportarExcel() {
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      let conteudo = "UUID,Nome,Sobrenome,Email\n";
-      lista.forEach(u => conteudo += `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"\n`);
-      const blob = new Blob([conteudo], { type: "text/csv" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "usuarios.csv";
-      a.click();
+    /* ====== CRUD Cadastros ====== */
+    function carregarLista(){
+      const u = JSON.parse(localStorage.getItem('usuarioLogado')); if(!u) return [];
+      return JSON.parse(localStorage.getItem(safeKey(u.email))) || [];
+    }
+    function salvarLista(lista){
+      const u = JSON.parse(localStorage.getItem('usuarioLogado')); if(!u) return;
+      localStorage.setItem(safeKey(u.email), JSON.stringify(lista));
     }
 
-    function exportarPDF() {
-      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
-      let conteudo = "Cadastro de Usuários\n\n";
-      lista.forEach(u => conteudo += `${u.nome} ${u.sobrenome} - ${u.email}\n`);
-      const blob = new Blob([conteudo], { type: "application/pdf" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "usuarios.pdf";
-      a.click();
+    function adicionarRegistro(){
+      const n = document.getElementById('cNome').value.trim();
+      const s = document.getElementById('cSobrenome').value.trim();
+      const e = document.getElementById('cEmail').value.trim();
+      if(!n || !s || !e) return alert('Preencha todos os campos.');
+      const lista = carregarLista();
+      lista.push({ uuid: gerarUUID(), nome: n, sobrenome: s, email: e, criadoEm:new Date().toISOString() });
+      salvarLista(lista);
+      document.getElementById('cNome').value = document.getElementById('cSobrenome').value = document.getElementById('cEmail').value = '';
+      mostrar();
     }
 
+    function mostrar(forceClear=false){
+      if(forceClear) document.getElementById('searchInput').value = '';
+      const tbody = document.querySelector('#tabela tbody'); tbody.innerHTML = '';
+      const lista = carregarLista();
+      const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+      const filtrada = lista.filter(item=>{
+        if(!q) return true;
+        return [item.uuid,item.nome,item.sobrenome,item.email,item.criadoEm||''].join(' ').toLowerCase().includes(q);
+      });
+
+      filtrada.forEach(item=>{
+        const tr = document.createElement('tr');
+        // fallback labels for mobile via data-label handled in CSS
+        tr.innerHTML = `
+          <td>${item.uuid}</td>
+          <td><input value="${escapeHtml(item.nome)}" onchange="atualizarCampo('${item.uuid}','nome',this.value)"></td>
+          <td><input value="${escapeHtml(item.sobrenome)}" onchange="atualizarCampo('${item.uuid}','sobrenome',this.value)"></td>
+          <td><input value="${escapeHtml(item.email)}" onchange="atualizarCampo('${item.uuid}','email',this.value)"></td>
+          <td>
+            <div class="row-actions">
+              <button class="action-btn save" onclick="atualizarRegistro('${item.uuid}')">Salvar</button>
+              <button class="action-btn del" onclick="apagar('${item.uuid}')">Apagar</button>
+              <button class="action-btn pdf" onclick="exportarPDFIndividual('${item.uuid}')">PDF</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(s){ return String(s).replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
+
+    function atualizarCampo(uuid,campo,valor){
+      const lista = carregarLista();
+      const it = lista.find(x=>x.uuid===uuid);
+      if(!it) return;
+      it[campo] = valor.trim();
+      salvarLista(lista);
+    }
+    function atualizarRegistro(uuid){ alert('Registro salvo!') }
+
+    function apagar(uuid){
+      if(!confirm('Apagar este registro?')) return;
+      let lista = cargarLista();
+      lista = lista.filter(x=>x.uuid!==uuid);
+      salvarLista(lista);
+      mostrar();
+    }
+    function apagarTudo(){
+      if(!confirm('Apagar todos os registros?')) return;
+      const u = JSON.parse(localStorage.getItem('usuarioLogado')); if(!u) return;
+      localStorage.setItem(safeKey(u.email), JSON.stringify([]));
+      mostrar();
+    }
+
+    /* ====== Export TXT / CSV ====== */
+    function exportarTXT(){
+      const lista = carregarLista();
+      if(!lista.length) return alert('Sem dados!');
+      let s = 'UUID\tNome\tSobrenome\tEmail\tCriadoEm\n';
+      lista.forEach(x=> s += `${x.uuid}\t${x.nome}\t${x.sobrenome}\t${x.email}\t${x.criadoEm||''}\n`);
+      const blob = new Blob([s],{type:'text/plain'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='cadastros.txt'; a.click(); URL.revokeObjectURL(a.href);
+    }
+    function exportarCSV(){
+      const lista = carregarLista();
+      if(!lista.length) return alert('Sem dados!');
+      let csv = 'UUID,Nome,Sobrenome,Email,CriadoEm\n';
+      lista.forEach(x=> csv += `"${x.uuid}","${x.nome}","${x.sobrenome}","${x.email}","${x.criadoEm||''}"\n`);
+      const blob = new Blob([csv],{type:'text/csv'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='cadastros.csv'; a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    /* ====== PDF (individual & geral) using jsPDF ====== */
+    function findItem(uuid){
+      const lista = carregarLista(); return lista.find(x=>x.uuid===uuid);
+    }
+
+    function exportarPDFIndividual(uuid){
+      const item = findItem(uuid);
+      if(!item) return alert('Registro não encontrado.');
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({unit:'pt', format:'a4'});
+      // header
+      if(pdfLogoBase64){ try{ doc.addImage(pdfLogoBase64,'PNG',40,24,80,30); }catch(e){} }
+      doc.setFontSize(16); doc.text('Relatório - Registro Individual', 140, 50);
+      doc.setFontSize(10); doc.text('Gerado em: ' + nowReadable(), 40, 72);
+      // body
+      let y = 110;
+      doc.setFontSize(12);
+      doc.text('UUID: ' + item.uuid, 40, y); y += 18;
+      doc.text('Nome: ' + item.nome, 40, y); y += 18;
+      doc.text('Sobrenome: ' + item.sobrenome, 40, y); y += 18;
+      doc.text('Email: ' + item.email, 40, y); y += 18;
+      if(item.criadoEm) { doc.text('Criado em: ' + new Date(item.criadoEm).toLocaleString(), 40, y); y += 18; }
+      // save
+      const filename = (item.nome || 'registro').replace(/[^a-z0-9_\-]/gi,'_') + '.pdf';
+      doc.save(filename);
+    }
+
+    function exportarPDFGeral(){
+      const lista = carregarLista();
+      if(!lista.length) return alert('Sem dados!');
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({unit:'pt', format:'a4'});
+      // header
+      if(pdfLogoBase64){ try{ doc.addImage(pdfLogoBase64,'PNG',40,24,80,30); }catch(e){} }
+      doc.setFontSize(16); doc.text('Relatório Geral de Cadastros', 40, 50);
+      doc.setFontSize(10); doc.text('Gerado em: ' + nowReadable(), 40, 72);
+
+      let y = 110;
+      doc.setFontSize(11);
+      lista.forEach((u, idx)=>{
+        doc.text(`${idx+1}. UUID: ${u.uuid}`, 40, y); y+=14;
+        doc.text(`   Nome: ${u.nome}`, 40, y); y+=14;
+        doc.text(`   Sobrenome: ${u.sobrenome}`, 40, y); y+=14;
+        doc.text(`   Email: ${u.email}`, 40, y); y+=16;
+        if(u.criadoEm){ doc.text(`   Criado em: ${new Date(u.criadoEm).toLocaleString()}`, 40, y); y+=16; }
+        y+=8;
+        if(y > 750){ doc.addPage(); y = 60; }
+      });
+      doc.save('cadastros_geral.pdf');
+    }
+
+    /* ====== Init / Boot ====== */
+    // Wire global functions to buttons/console if needed
+    window.registrar = registrar;
+    window.entrar = entrar;
+    window.iniciarSessao = iniciarSessao;
+    window.sair = sair;
+    window.apagarConta = apagarConta;
+    window.adicionarRegistro = adicionarRegistro;
+    window.mostrar = mostrar;
+    window.apagar = apagar;
+    window.apagarTudo = apagarTudo;
+    window.exportarTXT = exportarTXT;
+    window.exportarCSV = exportarCSV;
+    window.exportarPDFIndividual = exportarPDFIndividual;
+    window.exportarPDFGeral = exportarPDFGeral;
+    window.atualizarRegistro = atualizarRegistro;
+
+    // If already logged
+    if(localStorage.getItem('usuarioLogado')){
+      iniciarSessao();
+    }
+
+    /* small utility: show empty table initially */
     mostrar();
   </script>
 </body>
