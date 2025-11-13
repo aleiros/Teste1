@@ -2,453 +2,309 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistema Local - Cadastro Avançado (PDF por linha + Geral)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sistema Local - Visual Premium + PDF Estilizado</title>
 
-  <!-- jsPDF -->
+  <!-- jsPDF + autotable (para PDF bonito) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <style>
-    :root{
-      --primary:#2b6ef6;
-      --accent:#06b6d4;
-      --danger:#ef4444;
-      --muted:#6b7280;
-      --bg:#f6f8fb;
-      --card:#ffffff;
-      --radius:12px;
-      --shadow: 0 8px 30px rgba(15,23,42,0.08);
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      background: #eef2f7;
+      color: #222;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,Arial,sans-serif;
-      background:var(--bg);
-      color:#0f172a;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:24px;
-      display:flex;
-      justify-content:center;
+    .container {
+      max-width: 980px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
     }
-
-    .app{
-      width:100%;
-      max-width:1100px;
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1f4e79;
     }
-
-    /* top nav */
-    .nav{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      margin-bottom:18px;
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 0.95rem;
     }
-    .brand{font-weight:700;color:var(--primary);font-size:18px}
-    .nav .actions{display:flex;gap:8px;align-items:center}
-    .pill{
-      padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--accent));color:white;border:none;cursor:pointer;font-weight:600;
-      box-shadow: 0 6px 18px rgba(43,110,246,0.12);
+    input:focus {
+      border-color: #1f4e79;
+      outline: none;
     }
-    .ghost{background:transparent;border:1px solid rgba(15,23,42,0.06);padding:8px 12px;border-radius:10px;cursor:pointer}
-
-    /* layout */
-    .card{
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow:var(--shadow);
-      margin-bottom:18px;
+    button {
+      background: #1f4e79;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      transition: 0.3s;
     }
-
-    /* auth */
-    .auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .auth-grid .col{padding:12px}
-    .label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
-    input[type="text"], input[type="email"], input[type="password"]{
-      width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef9;background:#fbfdff;
+    button:hover {
+      background: #2460a0;
     }
-    .btn{
-      display:inline-block;padding:10px 14px;border-radius:10px;border:none;background:var(--primary);color:white;font-weight:700;cursor:pointer;
+    button.warn { background: #d9534f; }
+    button.gray { background: #888; }
+    button.blue { background: #007bff; }
+    button.purple { background: #8e44ad; }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
     }
-    .btn.warn{background:var(--danger)}
-    .small{font-size:13px;color:var(--muted)}
-
-    /* controls row */
-    .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px}
-    .controls .input{flex:1;min-width:180px}
-    .controls button{min-width:140px}
-
-    /* search */
-    .search{display:flex;gap:8px;align-items:center;margin-top:12px}
-    .search input{flex:1;padding:10px;border-radius:10px;border:1px solid #e6eef9;background:#fff}
-
-    /* table */
-    table{width:100%;border-collapse:collapse;margin-top:12px}
-    thead th{background:linear-gradient(90deg,var(--primary),var(--accent));color:white;padding:12px;text-align:left;font-weight:700}
-    th,td{padding:12px;border-bottom:1px solid #f1f5f9}
-    td input{width:100%;padding:8px;border-radius:8px;border:1px solid #eef2ff;background:transparent}
-    .row-actions{display:flex;gap:6px;align-items:center}
-    .action-btn{padding:8px 10px;border-radius:8px;border:none;color:white;cursor:pointer;font-weight:700}
-    .action-btn.pdf{background:linear-gradient(90deg,#7c3aed,#c026d3)}
-    .action-btn.del{background:var(--danger)}
-    .action-btn.save{background:#16a34a}
-
-    /* mobile cards */
-    @media(max-width:800px){
-      .auth-grid{grid-template-columns:1fr; }
-      table, thead, tbody, th, td, tr { display:block; width:100%;}
-      thead{display:none}
-      tr{background:var(--card);border-radius:10px;margin-bottom:12px;padding:12px;box-shadow:var(--shadow)}
-      td{display:flex;justify-content:space-between;align-items:center;border:none;padding:8px 6px}
-      td .left{flex:1}
-      td .label-mobile{font-weight:700;color:var(--muted);margin-right:8px}
-      td:not(:last-child){border-bottom:1px solid #f3f5f9}
-      .controls{flex-direction:column}
-      .controls .input{width:100%}
+    .col {
+      flex: 1;
+      min-width: 160px;
     }
-
-    /* footer small */
-    .meta{font-size:13px;color:var(--muted);margin-top:8px}
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1f4e79;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th {
+      background: #1f4e79;
+      color: #fff;
+      text-align: left;
+      padding: 10px;
+    }
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    tr:hover {
+      background: #eef3fa;
+    }
+    td input {
+      width: 95%;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    @media (max-width: 760px) {
+      table, thead, tbody, th, td, tr { display: block; width: 100%; }
+      thead { display: none; }
+      tr { background: #fff; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+      td { display: flex; justify-content: space-between; padding: 8px; border: none; }
+      td::before { content: attr(data-label); font-weight: bold; color: #333; flex: 1; }
+      td input { width: 60%; }
+    }
+    .msg { font-weight: bold; margin-top: 5px; }
   </style>
 </head>
 <body>
-  <div class="app">
 
-    <!-- NAV -->
-    <div class="nav">
-      <div class="brand">Sistema Local — Cadastros</div>
-      <div class="actions">
-        <button id="btnNew" class="ghost" onclick="mostrarRegister()">Registrar</button>
-        <button id="btnLogin" class="ghost" onclick="mostrarLogin()">Login</button>
+  <!-- LOGIN / REGISTRO -->
+  <div class="container" id="authContainer">
+    <h2 id="authTitle">Registrar</h2>
+    <div id="registerView">
+      <div class="row">
+        <input id="regNome" placeholder="Nome completo" class="col">
+        <input id="regEmail" placeholder="E-mail" class="col" type="email">
       </div>
+      <div class="row">
+        <input id="regSenha" placeholder="Senha (mín. 4)" type="password" class="col">
+        <input id="regSenhaConf" placeholder="Confirmar senha" type="password" class="col">
+      </div>
+      <div class="row">
+        <button onclick="registrar()">Criar conta</button>
+        <button class="gray" onclick="mostrarLogin()">Já tenho conta</button>
+      </div>
+      <p id="regMsg" class="msg"></p>
     </div>
 
-    <!-- AUTH CARD -->
-    <div id="authCard" class="card">
-      <div id="authInner">
-        <!-- by default show register & login compact -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:260px">
-            <div class="label">Nome</div>
-            <input id="regNome" type="text" placeholder="Seu nome completo">
-            <div class="label" style="margin-top:8px">Email</div>
-            <input id="regEmail" type="email" placeholder="seu@exemplo.com">
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="btn" onclick="registrar()">Criar Conta</button>
-              <button class="ghost" onclick="mostrarLogin()">Já tenho conta</button>
-            </div>
-          </div>
-          <div style="flex:1;min-width:260px">
-            <div class="label">Login</div>
-            <input id="logEmail" type="email" placeholder="Email">
-            <div class="label" style="margin-top:8px">Senha</div>
-            <input id="logSenha" type="password" placeholder="Senha">
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="btn" onclick="entrar()">Entrar</button>
-              <button class="ghost" onclick="mostrarRegister()">Registrar</button>
-            </div>
-          </div>
-        </div>
-        <div class="meta">Os dados ficam no seu navegador (localStorage). Para testes use vários e-mails diferentes.</div>
+    <div id="loginView" class="hidden">
+      <div class="row">
+        <input id="logEmail" placeholder="E-mail" class="col" type="email">
+        <input id="logSenha" placeholder="Senha" class="col" type="password">
       </div>
-    </div>
-
-    <!-- MAIN APP CARD -->
-    <div id="appCard" class="card" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div>
-          <div style="font-weight:800;font-size:18px">Cadastro Local Avançado</div>
-          <div class="small" id="userBadge">—</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="ghost" onclick="apagarConta()">Apagar conta</button>
-          <button class="pill" onclick="sair()">Sair</button>
-        </div>
+      <div class="row">
+        <button onclick="entrar()">Entrar</button>
+        <button class="gray" onclick="mostrarRegister()">Ainda não tenho conta</button>
       </div>
-
-      <!-- inputs + actions -->
-      <div class="controls" style="margin-top:16px">
-        <input id="cNome" class="input" placeholder="Nome">
-        <input id="cSobrenome" class="input" placeholder="Sobrenome">
-        <input id="cEmail" class="input" placeholder="Email">
-        <button class="pill" onclick="adicionarRegistro()">💾 Salvar</button>
-        <button class="ghost" onclick="apagarTudo()">🗑️ Apagar todos</button>
-      </div>
-
-      <div class="search" style="margin-top:14px">
-        <input id="searchInput" placeholder="🔍 Buscar por UUID, nome, sobrenome, email" oninput="mostrar()">
-        <div style="display:flex;gap:8px">
-          <button class="ghost" onclick="mostrar(true)">Limpar</button>
-          <button class="ghost" onclick="mostrar(true); document.getElementById('searchInput').value='';">Atualizar</button>
-        </div>
-      </div>
-
-      <!-- table -->
-      <div style="overflow:auto;margin-top:14px">
-        <table id="tabela">
-          <thead>
-            <tr>
-              <th>UUID</th>
-              <th>Nome</th>
-              <th>Sobrenome</th>
-              <th>Email</th>
-              <th style="width:210px">Ações</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- export -->
-      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
-        <button class="btn-txt ghost" onclick="exportarTXT()">Exportar TXT</button>
-        <button class="btn-excel ghost" onclick="exportarCSV()">Exportar Excel (CSV)</button>
-        <button class="btn-pdf ghost" onclick="exportarPDFGeral()">Exportar PDF Geral</button>
-      </div>
-
-      <div class="meta">Cada linha tem botão PDF individual — gera PDF somente daquele registro.</div>
+      <p id="logMsg" class="msg"></p>
     </div>
   </div>
 
-  <script>
-    /* ====== Helpers ====== */
-    const pdfLogoBase64 = ''; // coloque base64 se quiser logo no cabeçalho do PDF
-    function safeKey(email){ return 'cadastros_' + encodeURIComponent(email.toLowerCase()); }
-    function gerarUUID(){
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{
-        const r = Math.random()*16|0, v = c==='x'? r : (r&0x3|0x8);
-        return v.toString(16);
-      });
-    }
-    function nowReadable(){ return new Date().toLocaleString(); }
+  <!-- ÁREA PRINCIPAL -->
+  <div class="container hidden" id="mainContainer">
+    <div class="topbar">
+      <div>📋 Sistema Local</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="userBadge"></span>
+        <button onclick="sair()">Sair</button>
+      </div>
+    </div>
 
-    /* ====== AUTH / SESSÃO ====== */
-    function registrar(){
-      const nome = document.getElementById('regNome').value.trim();
-      const email = document.getElementById('regEmail').value.trim().toLowerCase();
-      if(!email || !nome) return alert('Preencha nome e email para registrar.');
-      let users = JSON.parse(localStorage.getItem('usuarios'))||[];
-      if(users.find(u=>u.email===email)) return alert('E-mail já registrado.');
-      // senha opcional aqui — para simplicidade não exigimos senha no registro compacto
-      users.push({ nome, email, senha: '' });
-      localStorage.setItem('usuarios', JSON.stringify(users));
-      alert('Conta criada. Faça login.');
-    }
+    <!-- Formulário -->
+    <div class="row" style="margin-top:10px;">
+      <input id="cNome" placeholder="Nome">
+      <input id="cSobrenome" placeholder="Sobrenome">
+      <input id="cEmail" placeholder="Email">
+    </div>
+    <div class="row">
+      <button onclick="adicionarRegistro()">💾 Salvar</button>
+      <button class="warn" onclick="apagarTudo()">🗑️ Apagar todos</button>
+      <button class="blue" onclick="exportarTXT()">📄 TXT</button>
+      <button class="gray" onclick="exportarExcel()">📊 Excel</button>
+      <button class="purple" onclick="exportarPDFGeral()">📘 PDF Geral</button>
+    </div>
 
-    function mostrarLogin(){ document.getElementById('authCard').style.display='block'; }
-    function mostrarRegister(){ document.getElementById('authCard').style.display='block'; }
+    <!-- Busca -->
+    <div class="row">
+      <input id="searchInput" placeholder="Buscar..." oninput="mostrar()">
+      <button class="gray" onclick="mostrar(true)">🔄 Atualizar</button>
+    </div>
 
-    function entrar(){
-      const e = document.getElementById('logEmail').value.trim().toLowerCase();
-      const s = document.getElementById('logSenha').value;
-      const users = JSON.parse(localStorage.getItem('usuarios'))||[];
-      const user = users.find(u=>u.email===e);
-      if(!user) return alert('Usuário não encontrado. Registre primeiro.');
-      // aceitaremos qualquer senha (ou you can check) — simple local auth
-      localStorage.setItem('usuarioLogado', JSON.stringify(user));
-      iniciarSessao();
-    }
+    <!-- Tabela -->
+    <table id="tabela">
+      <thead>
+        <tr><th>UUID</th><th>Nome</th><th>Sobrenome</th><th>Email</th><th>Ações</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-    function iniciarSessao(){
-      const u = JSON.parse(localStorage.getItem('usuarioLogado'));
-      if(!u) return;
-      document.getElementById('authCard').style.display='none';
-      document.getElementById('appCard').style.display='block';
-      document.getElementById('userBadge').textContent = u.nome + ' — ' + u.email;
-      mostrar();
-    }
+<script>
+const { jsPDF } = window.jspdf;
+function safeEmailKey(email){ return 'cadastros_' + encodeURIComponent(email.toLowerCase()); }
+function gerarUUID(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
 
-    function sair(){
-      localStorage.removeItem('usuarioLogado');
-      document.getElementById('appCard').style.display='none';
-      document.getElementById('authCard').style.display='block';
-    }
+function mostrarLogin(){document.getElementById('authTitle').innerText='Login';document.getElementById('registerView').style.display='none';document.getElementById('loginView').style.display='block';}
+function mostrarRegister(){document.getElementById('authTitle').innerText='Registrar';document.getElementById('registerView').style.display='block';document.getElementById('loginView').style.display='none';}
 
-    function apagarConta(){
-      if(!confirm('Apagar conta e todos os cadastros? Esta ação é irreversível.')) return;
-      const u = JSON.parse(localStorage.getItem('usuarioLogado'));
-      if(!u) return;
-      // remove user from global (optional)
-      let users = JSON.parse(localStorage.getItem('usuarios'))||[];
-      users = users.filter(x=>x.email !== u.email);
-      localStorage.setItem('usuarios', JSON.stringify(users));
-      // remove cadastros
-      localStorage.removeItem(safeKey(u.email));
-      sair();
-      alert('Conta removida.');
-    }
+function registrar(){
+  const nome=document.getElementById('regNome').value.trim(), email=document.getElementById('regEmail').value.trim().toLowerCase();
+  const senha=document.getElementById('regSenha').value, conf=document.getElementById('regSenhaConf').value, msg=document.getElementById('regMsg');
+  if(!nome||!email||!senha||!conf) return msg.textContent='Preencha todos!';
+  if(senha.length<4) return msg.textContent='Senha curta.';
+  if(senha!==conf) return msg.textContent='Senhas diferentes.';
+  const users=JSON.parse(localStorage.getItem('usuarios'))||[];
+  if(users.find(u=>u.email===email)) return msg.textContent='E-mail já cadastrado.';
+  users.push({nome,email,senha});localStorage.setItem('usuarios',JSON.stringify(users));
+  msg.style.color='green';msg.textContent='Conta criada!';setTimeout(()=>mostrarLogin(),800);
+}
 
-    /* ====== CRUD Cadastros ====== */
-    function carregarLista(){
-      const u = JSON.parse(localStorage.getItem('usuarioLogado')); if(!u) return [];
-      return JSON.parse(localStorage.getItem(safeKey(u.email))) || [];
-    }
-    function salvarLista(lista){
-      const u = JSON.parse(localStorage.getItem('usuarioLogado')); if(!u) return;
-      localStorage.setItem(safeKey(u.email), JSON.stringify(lista));
-    }
+function entrar(){
+  const email=document.getElementById('logEmail').value.trim().toLowerCase(), senha=document.getElementById('logSenha').value;
+  const msg=document.getElementById('logMsg');
+  const users=JSON.parse(localStorage.getItem('usuarios'))||[];
+  const user=users.find(u=>u.email===email&&u.senha===senha);
+  if(!user){msg.textContent='Credenciais inválidas.';return;}
+  localStorage.setItem('usuarioLogado',JSON.stringify(user));iniciarSessao();
+}
 
-    function adicionarRegistro(){
-      const n = document.getElementById('cNome').value.trim();
-      const s = document.getElementById('cSobrenome').value.trim();
-      const e = document.getElementById('cEmail').value.trim();
-      if(!n || !s || !e) return alert('Preencha todos os campos.');
-      const lista = carregarLista();
-      lista.push({ uuid: gerarUUID(), nome: n, sobrenome: s, email: e, criadoEm:new Date().toISOString() });
-      salvarLista(lista);
-      document.getElementById('cNome').value = document.getElementById('cSobrenome').value = document.getElementById('cEmail').value = '';
-      mostrar();
-    }
+function sair(){localStorage.removeItem('usuarioLogado');document.getElementById('mainContainer').classList.add('hidden');document.getElementById('authContainer').classList.remove('hidden');mostrarLogin();}
 
-    function mostrar(forceClear=false){
-      if(forceClear) document.getElementById('searchInput').value = '';
-      const tbody = document.querySelector('#tabela tbody'); tbody.innerHTML = '';
-      const lista = carregarLista();
-      const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
-      const filtrada = lista.filter(item=>{
-        if(!q) return true;
-        return [item.uuid,item.nome,item.sobrenome,item.email,item.criadoEm||''].join(' ').toLowerCase().includes(q);
-      });
+function iniciarSessao(){
+  const user=JSON.parse(localStorage.getItem('usuarioLogado'));
+  if(!user)return;
+  document.getElementById('userBadge').textContent=user.nome+' ('+user.email+')';
+  document.getElementById('authContainer').classList.add('hidden');
+  document.getElementById('mainContainer').classList.remove('hidden');
+  mostrar();
+}
 
-      filtrada.forEach(item=>{
-        const tr = document.createElement('tr');
-        // fallback labels for mobile via data-label handled in CSS
-        tr.innerHTML = `
-          <td>${item.uuid}</td>
-          <td><input value="${escapeHtml(item.nome)}" onchange="atualizarCampo('${item.uuid}','nome',this.value)"></td>
-          <td><input value="${escapeHtml(item.sobrenome)}" onchange="atualizarCampo('${item.uuid}','sobrenome',this.value)"></td>
-          <td><input value="${escapeHtml(item.email)}" onchange="atualizarCampo('${item.uuid}','email',this.value)"></td>
-          <td>
-            <div class="row-actions">
-              <button class="action-btn save" onclick="atualizarRegistro('${item.uuid}')">Salvar</button>
-              <button class="action-btn del" onclick="apagar('${item.uuid}')">Apagar</button>
-              <button class="action-btn pdf" onclick="exportarPDFIndividual('${item.uuid}')">PDF</button>
-            </div>
-          </td>`;
-        tbody.appendChild(tr);
-      });
-    }
+function carregarLista(){const user=JSON.parse(localStorage.getItem('usuarioLogado'));if(!user)return[];return JSON.parse(localStorage.getItem(safeEmailKey(user.email)))||[];}
+function salvarLista(lista){const user=JSON.parse(localStorage.getItem('usuarioLogado'));if(!user)return;localStorage.setItem(safeEmailKey(user.email),JSON.stringify(lista));}
 
-    function escapeHtml(s){ return String(s).replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
+function adicionarRegistro(){
+  const n=cNome.value.trim(),s=cSobrenome.value.trim(),e=cEmail.value.trim();
+  if(!n||!s||!e)return alert('Preencha tudo!');
+  const lista=carregarLista();lista.push({uuid:gerarUUID(),nome:n,sobrenome:s,email:e,criadoEm:new Date().toISOString()});
+  salvarLista(lista);cNome.value=cSobrenome.value=cEmail.value='';mostrar();
+}
 
-    function atualizarCampo(uuid,campo,valor){
-      const lista = carregarLista();
-      const it = lista.find(x=>x.uuid===uuid);
-      if(!it) return;
-      it[campo] = valor.trim();
-      salvarLista(lista);
-    }
-    function atualizarRegistro(uuid){ alert('Registro salvo!') }
+function mostrar(force=false){
+  if(force) searchInput.value='';
+  const tbody=document.querySelector('#tabela tbody');tbody.innerHTML='';
+  const lista=carregarLista();const q=searchInput.value.toLowerCase().trim();
+  const filtrada=lista.filter(i=>!q||Object.values(i).join(' ').toLowerCase().includes(q));
+  filtrada.forEach(item=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td data-label="UUID">${item.uuid}</td>
+      <td data-label="Nome"><input value="${item.nome}" onchange="atualizarCampo('${item.uuid}','nome',this.value)"></td>
+      <td data-label="Sobrenome"><input value="${item.sobrenome}" onchange="atualizarCampo('${item.uuid}','sobrenome',this.value)"></td>
+      <td data-label="Email"><input value="${item.email}" onchange="atualizarCampo('${item.uuid}','email',this.value)"></td>
+      <td data-label="Ações">
+        <button class='purple' onclick='exportarPDFIndividual(${JSON.stringify(item)})'>PDF</button>
+        <button class='warn' onclick='apagar("${item.uuid}")'>Apagar</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
 
-    function apagar(uuid){
-      if(!confirm('Apagar este registro?')) return;
-      let lista = cargarLista();
-      lista = lista.filter(x=>x.uuid!==uuid);
-      salvarLista(lista);
-      mostrar();
-    }
-    function apagarTudo(){
-      if(!confirm('Apagar todos os registros?')) return;
-      const u = JSON.parse(localStorage.getItem('usuarioLogado')); if(!u) return;
-      localStorage.setItem(safeKey(u.email), JSON.stringify([]));
-      mostrar();
-    }
+function atualizarCampo(uuid,campo,valor){const lista=carregarLista();const item=lista.find(x=>x.uuid===uuid);if(item){item[campo]=valor;salvarLista(lista);}}
 
-    /* ====== Export TXT / CSV ====== */
-    function exportarTXT(){
-      const lista = carregarLista();
-      if(!lista.length) return alert('Sem dados!');
-      let s = 'UUID\tNome\tSobrenome\tEmail\tCriadoEm\n';
-      lista.forEach(x=> s += `${x.uuid}\t${x.nome}\t${x.sobrenome}\t${x.email}\t${x.criadoEm||''}\n`);
-      const blob = new Blob([s],{type:'text/plain'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='cadastros.txt'; a.click(); URL.revokeObjectURL(a.href);
-    }
-    function exportarCSV(){
-      const lista = carregarLista();
-      if(!lista.length) return alert('Sem dados!');
-      let csv = 'UUID,Nome,Sobrenome,Email,CriadoEm\n';
-      lista.forEach(x=> csv += `"${x.uuid}","${x.nome}","${x.sobrenome}","${x.email}","${x.criadoEm||''}"\n`);
-      const blob = new Blob([csv],{type:'text/csv'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='cadastros.csv'; a.click(); URL.revokeObjectURL(a.href);
-    }
+function apagar(uuid){if(!confirm('Apagar?'))return;let lista=carregarLista();lista=lista.filter(x=>x.uuid!==uuid);salvarLista(lista);mostrar();}
+function apagarTudo(){if(!confirm('Apagar todos?'))return;const user=JSON.parse(localStorage.getItem('usuarioLogado'));localStorage.setItem(safeEmailKey(user.email),JSON.stringify([]));mostrar();}
 
-    /* ====== PDF (individual & geral) using jsPDF ====== */
-    function findItem(uuid){
-      const lista = carregarLista(); return lista.find(x=>x.uuid===uuid);
-    }
+/* ===== Exportações ===== */
+function exportarTXT(){const lista=carregarLista();if(lista.length===0)return alert('Sem dados!');const blob=new Blob([JSON.stringify(lista,null,2)],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='cadastros.txt';a.click();}
+function exportarExcel(){const lista=carregarLista();if(lista.length===0)return alert('Sem dados!');let csv='UUID,Nome,Sobrenome,Email\\n';lista.forEach(x=>csv+=`${x.uuid},${x.nome},${x.sobrenome},${x.email}\\n`);const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='cadastros.csv';a.click();}
 
-    function exportarPDFIndividual(uuid){
-      const item = findItem(uuid);
-      if(!item) return alert('Registro não encontrado.');
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({unit:'pt', format:'a4'});
-      // header
-      if(pdfLogoBase64){ try{ doc.addImage(pdfLogoBase64,'PNG',40,24,80,30); }catch(e){} }
-      doc.setFontSize(16); doc.text('Relatório - Registro Individual', 140, 50);
-      doc.setFontSize(10); doc.text('Gerado em: ' + nowReadable(), 40, 72);
-      // body
-      let y = 110;
-      doc.setFontSize(12);
-      doc.text('UUID: ' + item.uuid, 40, y); y += 18;
-      doc.text('Nome: ' + item.nome, 40, y); y += 18;
-      doc.text('Sobrenome: ' + item.sobrenome, 40, y); y += 18;
-      doc.text('Email: ' + item.email, 40, y); y += 18;
-      if(item.criadoEm) { doc.text('Criado em: ' + new Date(item.criadoEm).toLocaleString(), 40, y); y += 18; }
-      // save
-      const filename = (item.nome || 'registro').replace(/[^a-z0-9_\-]/gi,'_') + '.pdf';
-      doc.save(filename);
-    }
+/* ===== PDF bonito ===== */
+function exportarPDFIndividual(item){
+  const doc=new jsPDF();
+  doc.setFontSize(16);
+  doc.setTextColor(31,78,121);
+  doc.text('Relatório Individual',105,20,null,null,'center');
+  doc.setFontSize(11);
+  doc.text(`Gerado em: ${new Date().toLocaleString()}`,105,30,null,null,'center');
+  doc.autoTable({
+    startY:50,
+    body:[[item.uuid,item.nome,item.sobrenome,item.email,new Date(item.criadoEm).toLocaleString()]],
+    head:[['UUID','Nome','Sobrenome','Email','Criado em']],
+    styles:{halign:'center',fontSize:10},
+    headStyles:{fillColor:[31,78,121]},
+  });
+  doc.save(`${item.nome||'registro'}.pdf`);
+}
 
-    function exportarPDFGeral(){
-      const lista = carregarLista();
-      if(!lista.length) return alert('Sem dados!');
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({unit:'pt', format:'a4'});
-      // header
-      if(pdfLogoBase64){ try{ doc.addImage(pdfLogoBase64,'PNG',40,24,80,30); }catch(e){} }
-      doc.setFontSize(16); doc.text('Relatório Geral de Cadastros', 40, 50);
-      doc.setFontSize(10); doc.text('Gerado em: ' + nowReadable(), 40, 72);
+function exportarPDFGeral(){
+  const lista=carregarLista();if(lista.length===0)return alert('Sem dados!');
+  const doc=new jsPDF();
+  doc.setFontSize(16);
+  doc.setTextColor(31,78,121);
+  doc.text('Relatório Geral de Cadastros',105,20,null,null,'center');
+  doc.setFontSize(11);
+  doc.text(`Gerado em: ${new Date().toLocaleString()}`,105,30,null,null,'center');
+  doc.autoTable({
+    startY:50,
+    head:[['UUID','Nome','Sobrenome','Email','Criado em']],
+    body:lista.map(x=>[x.uuid,x.nome,x.sobrenome,x.email,new Date(x.criadoEm).toLocaleString()]),
+    styles:{fontSize:9,halign:'center'},
+    headStyles:{fillColor:[31,78,121]},
+    alternateRowStyles:{fillColor:[240,244,250]},
+  });
+  doc.save('cadastros_geral.pdf');
+}
 
-      let y = 110;
-      doc.setFontSize(11);
-      lista.forEach((u, idx)=>{
-        doc.text(`${idx+1}. UUID: ${u.uuid}`, 40, y); y+=14;
-        doc.text(`   Nome: ${u.nome}`, 40, y); y+=14;
-        doc.text(`   Sobrenome: ${u.sobrenome}`, 40, y); y+=14;
-        doc.text(`   Email: ${u.email}`, 40, y); y+=16;
-        if(u.criadoEm){ doc.text(`   Criado em: ${new Date(u.criadoEm).toLocaleString()}`, 40, y); y+=16; }
-        y+=8;
-        if(y > 750){ doc.addPage(); y = 60; }
-      });
-      doc.save('cadastros_geral.pdf');
-    }
-
-    /* ====== Init / Boot ====== */
-    // Wire global functions to buttons/console if needed
-    window.registrar = registrar;
-    window.entrar = entrar;
-    window.iniciarSessao = iniciarSessao;
-    window.sair = sair;
-    window.apagarConta = apagarConta;
-    window.adicionarRegistro = adicionarRegistro;
-    window.mostrar = mostrar;
-    window.apagar = apagar;
-    window.apagarTudo = apagarTudo;
-    window.exportarTXT = exportarTXT;
-    window.exportarCSV = exportarCSV;
-    window.exportarPDFIndividual = exportarPDFIndividual;
-    window.exportarPDFGeral = exportarPDFGeral;
-    window.atualizarRegistro = atualizarRegistro;
-
-    // If already logged
-    if(localStorage.getItem('usuarioLogado')){
-      iniciarSessao();
-    }
-
-    /* small utility: show empty table initially */
-    mostrar();
-  </script>
+/* ===== Inicialização ===== */
+window.addEventListener('load',()=>{localStorage.getItem('usuarioLogado')?iniciarSessao():mostrarRegister();});
+</script>
 </body>
 </html>
