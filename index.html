@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema Local - Login + Cadastro Avançado</title>
+  <title>Sistema Local - Login + Cadastro Avançado + PDF</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -45,7 +46,6 @@
 
     .hidden { display: none; }
 
-    /* Área principal */
     .topbar {
       background: #4CAF50;
       color: white;
@@ -58,7 +58,6 @@
       padding: 6px 12px;
     }
 
-    /* Tabela */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -85,10 +84,10 @@
       color: white;
       cursor: pointer;
     }
-    td button:first-child { background: #2196F3; } /* Alterar */
-    td button:last-child { background: #f44336; }  /* Apagar */
+    td button:first-child { background: #2196F3; }
+    td button:nth-child(2) { background: #f44336; }
+    td button:last-child { background: #9C27B0; } /* PDF Individual */
 
-    /* Responsividade: vira cards */
     @media (max-width: 720px) {
       table, thead, tbody, th, td, tr { display: block; width: 100%; }
       thead { display: none; }
@@ -109,7 +108,6 @@
         padding: 8px 6px;
         border: none;
         border-bottom: 1px solid #f0f0f0;
-        box-sizing: border-box;
       }
 
       td:last-child { border-bottom: none; }
@@ -119,34 +117,17 @@
         font-weight: 600;
         margin-right: 10px;
         flex: 0 0 40%;
-        white-space: nowrap;
         color: #555;
-        font-size: 0.95em;
       }
 
-      td input {
-        width: 60%;
-        min-width: 120px;
-      }
-
-      td:last-child {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-        align-items: center;
-      }
-
-      .wrap input, .wrap button {
-        width: 100%;
-        display: block;
-        margin: 6px 0;
-      }
+      td input { width: 60%; }
+      td:last-child { display: flex; gap: 8px; justify-content: flex-end; }
+      .wrap input, .wrap button { width: 100%; display: block; margin: 6px 0; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Login / Registro -->
   <div class="container" id="loginRegistro">
     <h2 id="tituloForm">Registrar</h2>
     <input id="nome" placeholder="Nome completo" class="campo-registro">
@@ -156,7 +137,6 @@
     <button onclick="mostrarLogin()">Já tenho conta</button>
   </div>
 
-  <!-- Área Principal -->
   <div class="hidden" id="areaPrincipal">
     <div class="topbar">
       <span id="usuarioAtual"></span>
@@ -170,8 +150,9 @@
       <input id="cadEmail" placeholder="Email">
       <button onclick="salvar()">💾 Salvar</button>
       <button onclick="apagarTudo()">🗑️ Apagar todos</button>
-      <button onclick="exportarTXT()">💾 Exportar TXT</button>
+      <button onclick="exportarTXT()">📄 Exportar TXT</button>
       <button onclick="exportarExcel()">📊 Exportar Excel</button>
+      <button onclick="exportarPDFGeral()">📘 Exportar Todos PDF</button>
 
       <table id="tabela">
         <thead>
@@ -189,7 +170,6 @@
   </div>
 
   <script>
-    // LOGIN & REGISTRO
     const loginRegistro = document.getElementById("loginRegistro");
     const areaPrincipal = document.getElementById("areaPrincipal");
 
@@ -208,9 +188,9 @@
     }
 
     function registrar() {
-      const nome = document.getElementById("nome").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const senha = document.getElementById("senha").value.trim();
+      const nome = nomeInput.value.trim();
+      const email = emailInput.value.trim();
+      const senha = senhaInput.value.trim();
       if (!nome || !email || !senha) return alert("Preencha todos os campos!");
 
       const usuarios = JSON.parse(localStorage.getItem("usuariosLogin")) || [];
@@ -223,8 +203,8 @@
     }
 
     function login() {
-      const email = document.getElementById("email").value.trim();
-      const senha = document.getElementById("senha").value.trim();
+      const email = emailInput.value.trim();
+      const senha = senhaInput.value.trim();
       const usuarios = JSON.parse(localStorage.getItem("usuariosLogin")) || [];
       const usuario = usuarios.find(u => u.email === email && u.senha === senha);
       if (!usuario) return alert("Credenciais inválidas.");
@@ -240,7 +220,7 @@
       mostrarLogin();
     }
 
-    // CADASTRO LOCAL AVANÇADO
+    // ===== CADASTRO LOCAL =====
     function gerarUUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
         const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -249,22 +229,18 @@
     }
 
     function salvar() {
-      const nome = document.getElementById("cadNome").value.trim();
-      const sobrenome = document.getElementById("cadSobrenome").value.trim();
-      const email = document.getElementById("cadEmail").value.trim();
+      const nome = cadNome.value.trim();
+      const sobrenome = cadSobrenome.value.trim();
+      const email = cadEmail.value.trim();
       if (!nome || !sobrenome || !email) return alert("Preencha todos os campos!");
 
       const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
       const chave = "cadastros_" + usuario.email;
-
       let lista = JSON.parse(localStorage.getItem(chave)) || [];
       lista.push({ uuid: gerarUUID(), nome, sobrenome, email });
       localStorage.setItem(chave, JSON.stringify(lista));
       mostrar();
-
-      document.getElementById("cadNome").value = "";
-      document.getElementById("cadSobrenome").value = "";
-      document.getElementById("cadEmail").value = "";
+      cadNome.value = cadSobrenome.value = cadEmail.value = "";
     }
 
     function mostrar() {
@@ -277,48 +253,47 @@
       lista.forEach(item => {
         const tr = document.createElement("tr");
 
-        const tdUUID = document.createElement("td");
-        tdUUID.textContent = item.uuid;
-        tdUUID.setAttribute("data-label", "UUID");
-        tr.appendChild(tdUUID);
-
-        const tdNome = document.createElement("td");
-        const inputNome = document.createElement("input");
-        inputNome.value = item.nome;
-        inputNome.onchange = () => atualizarCampo(item.uuid, 'nome', inputNome.value);
-        tdNome.appendChild(inputNome);
-        tdNome.setAttribute("data-label", "Nome");
-        tr.appendChild(tdNome);
-
-        const tdSobrenome = document.createElement("td");
-        const inputSob = document.createElement("input");
-        inputSob.value = item.sobrenome;
-        inputSob.onchange = () => atualizarCampo(item.uuid, 'sobrenome', inputSob.value);
-        tdSobrenome.appendChild(inputSob);
-        tdSobrenome.setAttribute("data-label", "Sobrenome");
-        tr.appendChild(tdSobrenome);
-
-        const tdEmail = document.createElement("td");
-        const inputEmail = document.createElement("input");
-        inputEmail.value = item.email;
-        inputEmail.onchange = () => atualizarCampo(item.uuid, 'email', inputEmail.value);
-        tdEmail.appendChild(inputEmail);
-        tdEmail.setAttribute("data-label", "Email");
-        tr.appendChild(tdEmail);
+        const tdUUID = criarCelula(item.uuid, "UUID");
+        const tdNome = criarInputCelula(item, "nome", "Nome");
+        const tdSob = criarInputCelula(item, "sobrenome", "Sobrenome");
+        const tdEmail = criarInputCelula(item, "email", "Email");
 
         const tdAcoes = document.createElement("td");
         tdAcoes.setAttribute("data-label", "Ações");
-        const btnAlt = document.createElement("button");
-        btnAlt.textContent = "Alterar";
-        btnAlt.onclick = () => atualizarRegistro(item.uuid);
-        const btnDel = document.createElement("button");
-        btnDel.textContent = "Apagar";
-        btnDel.onclick = () => apagar(item.uuid);
-        tdAcoes.append(btnAlt, btnDel);
-        tr.appendChild(tdAcoes);
 
+        const btnAlt = criarBotao("Alterar", "#2196F3", () => alert("Atualizado!"));
+        const btnDel = criarBotao("Apagar", "#f44336", () => apagar(item.uuid));
+        const btnPDF = criarBotao("PDF", "#9C27B0", () => exportarPDFIndividual(item));
+
+        tdAcoes.append(btnAlt, btnDel, btnPDF);
+        tr.append(tdUUID, tdNome, tdSob, tdEmail, tdAcoes);
         tbody.appendChild(tr);
       });
+    }
+
+    function criarCelula(texto, label) {
+      const td = document.createElement("td");
+      td.textContent = texto;
+      td.setAttribute("data-label", label);
+      return td;
+    }
+
+    function criarInputCelula(item, campo, label) {
+      const td = document.createElement("td");
+      const input = document.createElement("input");
+      input.value = item[campo];
+      input.onchange = () => atualizarCampo(item.uuid, campo, input.value);
+      td.appendChild(input);
+      td.setAttribute("data-label", label);
+      return td;
+    }
+
+    function criarBotao(texto, cor, acao) {
+      const btn = document.createElement("button");
+      btn.textContent = texto;
+      btn.style.background = cor;
+      btn.onclick = acao;
+      return btn;
     }
 
     function atualizarCampo(uuid, campo, valor) {
@@ -326,13 +301,8 @@
       const chave = "cadastros_" + usuario.email;
       let lista = JSON.parse(localStorage.getItem(chave)) || [];
       const item = lista.find(u => u.uuid === uuid);
-      if (!item) return;
-      item[campo] = valor;
+      if (item) item[campo] = valor;
       localStorage.setItem(chave, JSON.stringify(lista));
-    }
-
-    function atualizarRegistro(uuid) {
-      alert("Registro atualizado!");
     }
 
     function apagar(uuid) {
@@ -352,43 +322,39 @@
       mostrar();
     }
 
-    function gerarTXT(lista) {
-      let conteudo = "UUID\tNome\tSobrenome\tEmail\n";
-      lista.forEach(u => {
-        conteudo += `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}\n`;
-      });
-      return conteudo;
+    // ===== EXPORTAÇÃO =====
+    function exportarPDFIndividual(item) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("Registro Individual", 10, 10);
+      doc.text(`UUID: ${item.uuid}`, 10, 30);
+      doc.text(`Nome: ${item.nome}`, 10, 40);
+      doc.text(`Sobrenome: ${item.sobrenome}`, 10, 50);
+      doc.text(`Email: ${item.email}`, 10, 60);
+      doc.save(`${item.nome || "registro"}.pdf`);
     }
 
-    function exportarTXT() {
+    function exportarPDFGeral() {
       const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
       const lista = JSON.parse(localStorage.getItem("cadastros_" + usuario.email)) || [];
       if (lista.length === 0) return alert("Sem dados!");
-      const blob = new Blob([gerarTXT(lista)], { type: "text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "usuarios.txt";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
 
-    function exportarExcel() {
-      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
-      const lista = JSON.parse(localStorage.getItem("cadastros_" + usuario.email)) || [];
-      if (lista.length === 0) return alert("Sem dados!");
-      let conteudo = "UUID,Nome,Sobrenome,Email\n";
-      lista.forEach(u => {
-        conteudo += `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"\n`;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text("Relatório Geral de Cadastros", 10, 10);
+      doc.setFontSize(12);
+      let y = 30;
+      lista.forEach((u, i) => {
+        doc.text(`${i + 1}. ${u.nome} ${u.sobrenome} (${u.email})`, 10, y);
+        y += 10;
+        if (y > 270) { doc.addPage(); y = 20; }
       });
-      const blob = new Blob([conteudo], { type: "text/csv" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "usuarios.csv";
-      a.click();
-      URL.revokeObjectURL(a.href);
+      doc.save("cadastros_geral.pdf");
     }
 
-    // Mostrar sistema após login
+    // ===== SISTEMA =====
     function mostrarSistema() {
       const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
       document.getElementById("usuarioAtual").textContent = usuario.nome;
