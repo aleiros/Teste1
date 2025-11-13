@@ -5,212 +5,260 @@
   <title>Cadastro Local Avançado</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ======= ESTILO GERAL ======= */
-    :root {
-      --cor-principal: #4f8cff;
-      --cor-secundaria: #00c9a7;
-      --cor-fundo: #f4f7fb;
-      --cor-texto: #333;
-      --borda: 8px;
-      --sombra: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    body {
-      font-family: "Poppins", Arial, sans-serif;
-      background: var(--cor-fundo);
-      color: var(--cor-texto);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-
-    .container {
-      background: white;
-      width: 95%;
-      max-width: 850px;
-      margin: 30px auto;
-      border-radius: var(--borda);
-      box-shadow: var(--sombra);
-      padding: 25px;
-      transition: all 0.3s ease;
-      animation: aparecer 0.6s ease;
-    }
-
-    @keyframes aparecer {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h2 {
-      text-align: center;
-      color: var(--cor-principal);
-      margin-bottom: 20px;
-    }
-
-    input, button {
-      padding: 10px;
-      margin: 6px;
-      border-radius: var(--borda);
-      border: 1px solid #ccc;
-      font-size: 14px;
-      width: calc(100% - 20px);
+    /* =======================
+       ESTILO GLOBAL MODERNO
+    ======================== */
+    * {
       box-sizing: border-box;
       transition: all 0.2s ease;
     }
 
-    input:focus {
-      border-color: var(--cor-principal);
-      outline: none;
-      box-shadow: 0 0 5px var(--cor-principal);
+    body {
+      font-family: "Inter", Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #f8fafc, #eef2f3);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
     }
 
-    button {
-      background: linear-gradient(45deg, var(--cor-principal), var(--cor-secundaria));
-      color: white;
-      font-weight: bold;
+    h2 {
+      text-align: center;
+      color: #1f2937;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      padding: 25px;
+      margin-bottom: 40px;
+    }
+
+    /* =======================
+       LOGIN / REGISTRO
+    ======================== */
+    .login-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-section input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .login-section button {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      color: #fff;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
+      font-size: 16px;
+      font-weight: 600;
     }
 
-    button:hover {
-      opacity: 0.9;
-      transform: scale(1.03);
+    .login-section button:hover {
+      background: #1e40af;
     }
 
-    #login, #registro, #cadastro { display: none; }
+    .toggle {
+      color: #2563eb;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
 
-    /* ======= SEÇÃO DE CADASTRO ======= */
-    .botoes-acoes {
+    /* =======================
+       ÁREA DE CADASTRO
+    ======================== */
+    .input-area input {
+      padding: 10px;
+      margin: 5px;
+      width: calc(33% - 10px);
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .input-area button {
+      padding: 10px 16px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #22c55e;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .input-area button:hover {
+      background: #16a34a;
+    }
+
+    .export-buttons {
+      margin-top: 10px;
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       justify-content: center;
-      margin-bottom: 15px;
     }
 
+    .export-buttons button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .btn-txt { background: #6366f1; }
+    .btn-txt:hover { background: #4f46e5; }
+    .btn-excel { background: #10b981; }
+    .btn-excel:hover { background: #059669; }
+    .btn-pdf { background: #ef4444; }
+    .btn-pdf:hover { background: #b91c1c; }
+
+    /* =======================
+       CAMPO DE BUSCA
+    ======================== */
+    .search-bar {
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    .search-bar input {
+      width: 90%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #bbb;
+      font-size: 16px;
+    }
+
+    /* =======================
+       TABELA ESTILIZADA
+    ======================== */
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
-      border-radius: var(--borda);
+      background: #fff;
       overflow: hidden;
-      box-shadow: var(--sombra);
-      margin-top: 10px;
+      border-radius: 10px;
     }
 
     th, td {
-      padding: 12px;
-      border-bottom: 1px solid #eee;
       text-align: left;
-      font-size: 14px;
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
     }
 
     th {
-      background: var(--cor-principal);
-      color: white;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 600;
     }
 
     tr:hover {
-      background: #f9f9f9;
+      background: #f1f5f9;
     }
 
     td input {
       width: 100%;
       border: none;
       background: transparent;
-      border-bottom: 1px solid #ddd;
-      padding: 5px;
+      padding: 4px;
+      font-size: 14px;
     }
 
-    td input:focus {
-      border-color: var(--cor-secundaria);
-      outline: none;
-    }
-
-    .acoes button {
-      margin: 2px;
+    /* =======================
+       BOTÕES DENTRO DA TABELA
+    ======================== */
+    td button {
+      border: none;
       padding: 6px 10px;
       border-radius: 5px;
-      border: none;
-      color: white;
-      font-weight: 500;
+      color: #fff;
       cursor: pointer;
+      font-size: 13px;
+      margin-right: 4px;
     }
 
-    .alterar { background: #2196F3; }
-    .apagar { background: #f44336; }
-    .pdf { background: #9C27B0; }
+    .btn-edit {
+      background: #3b82f6;
+    }
 
-    /* ======= MOBILE: TABELA EM CARDS ======= */
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
+    .btn-edit:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-delete {
+      background: #ef4444;
+    }
+
+    .btn-delete:hover {
+      background: #b91c1c;
+    }
+
+    /* =======================
+       RESPONSIVIDADE
+    ======================== */
+    @media (max-width: 768px) {
+      .input-area input {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      table {
         display: block;
+        overflow-x: auto;
+        white-space: nowrap;
       }
 
-      th { display: none; }
-
-      tr {
-        background: white;
-        margin-bottom: 12px;
-        border-radius: var(--borda);
-        box-shadow: var(--sombra);
-        padding: 10px;
+      th, td {
+        padding: 10px 8px;
       }
 
-      td {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 5px;
-        border: none;
-        border-bottom: 1px solid #eee;
-      }
-
-      td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        color: var(--cor-principal);
+      .login-section button {
+        font-size: 15px;
       }
     }
-
   </style>
 </head>
 <body>
-
-  <div class="container" id="login">
-    <h2>Entrar</h2>
-    <input id="loginEmail" placeholder="Email">
-    <input id="loginSenha" type="password" placeholder="Senha">
-    <button onclick="entrar()">Entrar</button>
-    <button onclick="mostrarRegistro()">Criar conta</button>
+  <div class="container" id="loginContainer">
+    <h2 id="loginTitle">Entrar</h2>
+    <div class="login-section">
+      <input id="loginEmail" type="email" placeholder="Email">
+      <input id="loginSenha" type="password" placeholder="Senha">
+      <button onclick="entrar()">Entrar</button>
+      <p class="toggle" onclick="alternar()">Não tem conta? Registrar</p>
+    </div>
   </div>
 
-  <div class="container" id="registro">
-    <h2>Registrar</h2>
-    <input id="regEmail" placeholder="Email">
-    <input id="regSenha" type="password" placeholder="Senha">
-    <button onclick="registrar()">Salvar Registro</button>
-    <button onclick="mostrarLogin()">Voltar</button>
-  </div>
-
-  <div class="container" id="cadastro">
+  <div class="container" id="cadastroContainer" style="display:none;">
     <h2>Cadastro Local Avançado</h2>
 
-    <div class="botoes-acoes">
+    <div class="input-area">
       <input id="nome" placeholder="Nome">
       <input id="sobrenome" placeholder="Sobrenome">
       <input id="email" placeholder="Email">
-      <input id="busca" placeholder="🔍 Buscar..." oninput="mostrar()">
       <button onclick="salvar()">💾 Salvar</button>
-      <button onclick="exportarTXT()">TXT</button>
-      <button onclick="exportarExcel()">Excel</button>
-      <button onclick="exportarPDF()">PDF</button>
-      <button onclick="sair()">🚪 Sair</button>
+    </div>
+
+    <div class="search-bar">
+      <input id="busca" type="text" placeholder="🔍 Buscar por nome, sobrenome ou email..." oninput="buscar()">
     </div>
 
     <table id="tabela">
@@ -225,53 +273,34 @@
       </thead>
       <tbody></tbody>
     </table>
+
+    <div class="export-buttons">
+      <button class="btn-txt" onclick="exportarTXT()">💾 TXT</button>
+      <button class="btn-excel" onclick="exportarExcel()">📊 Excel</button>
+      <button class="btn-pdf" onclick="exportarPDF()">📄 PDF</button>
+    </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
-    let usuarioAtual = null;
-    mostrarLogin();
+    function alternar() {
+      const title = document.getElementById("loginTitle");
+      const btn = document.querySelector(".login-section button");
+      const toggle = document.querySelector(".toggle");
 
-    function mostrarLogin() {
-      document.getElementById("login").style.display = "block";
-      document.getElementById("registro").style.display = "none";
-      document.getElementById("cadastro").style.display = "none";
-    }
-
-    function mostrarRegistro() {
-      document.getElementById("login").style.display = "none";
-      document.getElementById("registro").style.display = "block";
-      document.getElementById("cadastro").style.display = "none";
-    }
-
-    function registrar() {
-      const email = regEmail.value.trim();
-      const senha = regSenha.value.trim();
-      if (!email || !senha) return alert("Preencha tudo!");
-      const contas = JSON.parse(localStorage.getItem("contas")) || [];
-      if (contas.find(c => c.email === email)) return alert("Email já registrado!");
-      contas.push({ email, senha });
-      localStorage.setItem("contas", JSON.stringify(contas));
-      alert("Conta criada!");
-      mostrarLogin();
+      if (title.textContent === "Entrar") {
+        title.textContent = "Registrar";
+        btn.textContent = "Registrar";
+        toggle.textContent = "Já tem conta? Entrar";
+      } else {
+        title.textContent = "Entrar";
+        btn.textContent = "Entrar";
+        toggle.textContent = "Não tem conta? Registrar";
+      }
     }
 
     function entrar() {
-      const email = loginEmail.value.trim();
-      const senha = loginSenha.value.trim();
-      const contas = JSON.parse(localStorage.getItem("contas")) || [];
-      const conta = contas.find(c => c.email === email && c.senha === senha);
-      if (!conta) return alert("Credenciais inválidas!");
-      usuarioAtual = email;
-      document.getElementById("login").style.display = "none";
-      document.getElementById("registro").style.display = "none";
-      document.getElementById("cadastro").style.display = "block";
-      mostrar();
-    }
-
-    function sair() {
-      usuarioAtual = null;
-      mostrarLogin();
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("cadastroContainer").style.display = "block";
     }
 
     function gerarUUID() {
@@ -282,66 +311,74 @@
     }
 
     function salvar() {
-      const nome = nomeInput.value.trim();
-      const sobrenome = sobrenomeInput.value.trim();
-      const email = emailInput.value.trim();
-      if (!nome || !sobrenome || !email) return alert("Preencha tudo!");
-      const lista = JSON.parse(localStorage.getItem(usuarioAtual)) || [];
-      lista.push({ uuid: gerarUUID(), nome, sobrenome, email });
-      localStorage.setItem(usuarioAtual, JSON.stringify(lista));
+      const nome = nomeEl.value.trim();
+      const sobrenome = sobrenomeEl.value.trim();
+      const email = emailEl.value.trim();
+
+      if (!nome || !sobrenome || !email) return alert("Preencha todos os campos!");
+      const uuid = gerarUUID();
+
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      lista.push({ uuid, nome, sobrenome, email });
+      localStorage.setItem("usuarios", JSON.stringify(lista));
       mostrar();
-      nomeInput.value = sobrenomeInput.value = emailInput.value = "";
+      nomeEl.value = sobrenomeEl.value = emailEl.value = "";
     }
 
-    function mostrar() {
-      const filtro = busca.value.toLowerCase();
-      const lista = JSON.parse(localStorage.getItem(usuarioAtual)) || [];
+    const nomeEl = document.getElementById("nome");
+    const sobrenomeEl = document.getElementById("sobrenome");
+    const emailEl = document.getElementById("email");
+
+    function mostrar(filtro = "") {
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
       const tbody = document.querySelector("#tabela tbody");
       tbody.innerHTML = "";
+
       lista
         .filter(u =>
-          u.uuid.toLowerCase().includes(filtro) ||
           u.nome.toLowerCase().includes(filtro) ||
           u.sobrenome.toLowerCase().includes(filtro) ||
           u.email.toLowerCase().includes(filtro)
         )
-        .forEach(u => {
+        .forEach(item => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td data-label="UUID">${u.uuid}</td>
-            <td data-label="Nome"><input value="${u.nome}" onchange="editar('${u.uuid}', 'nome', this.value)"></td>
-            <td data-label="Sobrenome"><input value="${u.sobrenome}" onchange="editar('${u.uuid}', 'sobrenome', this.value)"></td>
-            <td data-label="Email"><input value="${u.email}" onchange="editar('${u.uuid}', 'email', this.value)"></td>
-            <td data-label="Ações" class="acoes">
-              <button class="alterar" onclick="alert('Atualizado!')">Salvar</button>
-              <button class="apagar" onclick="apagar('${u.uuid}')">Apagar</button>
-              <button class="pdf" onclick="exportarPDF('${u.uuid}')">PDF</button>
+            <td>${item.uuid}</td>
+            <td><input value="${item.nome}" onchange="atualizar('${item.uuid}','nome',this.value)"></td>
+            <td><input value="${item.sobrenome}" onchange="atualizar('${item.uuid}','sobrenome',this.value)"></td>
+            <td><input value="${item.email}" onchange="atualizar('${item.uuid}','email',this.value)"></td>
+            <td>
+              <button class="btn-edit" onclick="alert('Editado!')">Editar</button>
+              <button class="btn-delete" onclick="apagar('${item.uuid}')">Apagar</button>
             </td>`;
           tbody.appendChild(tr);
         });
     }
 
-    function editar(uuid, campo, valor) {
-      const lista = JSON.parse(localStorage.getItem(usuarioAtual)) || [];
-      const item = lista.find(u => u.uuid === uuid);
-      if (item) {
-        item[campo] = valor;
-        localStorage.setItem(usuarioAtual, JSON.stringify(lista));
-      }
+    function atualizar(uuid, campo, valor) {
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      const item = lista.find(i => i.uuid === uuid);
+      if (item) item[campo] = valor;
+      localStorage.setItem("usuarios", JSON.stringify(lista));
     }
 
     function apagar(uuid) {
-      if (!confirm("Apagar este registro?")) return;
-      let lista = JSON.parse(localStorage.getItem(usuarioAtual)) || [];
-      lista = lista.filter(u => u.uuid !== uuid);
-      localStorage.setItem(usuarioAtual, JSON.stringify(lista));
+      let lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      lista = lista.filter(i => i.uuid !== uuid);
+      localStorage.setItem("usuarios", JSON.stringify(lista));
       mostrar();
     }
 
+    function buscar() {
+      const termo = document.getElementById("busca").value.toLowerCase();
+      mostrar(termo);
+    }
+
+    // ===== EXPORTAÇÕES =====
     function exportarTXT() {
-      const lista = JSON.parse(localStorage.getItem(usuarioAtual)) || [];
-      if (!lista.length) return alert("Sem dados!");
-      const conteudo = lista.map(u => `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}`).join("\n");
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      let conteudo = "UUID\tNome\tSobrenome\tEmail\n";
+      lista.forEach(u => conteudo += `${u.uuid}\t${u.nome}\t${u.sobrenome}\t${u.email}\n`);
       const blob = new Blob([conteudo], { type: "text/plain" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -350,9 +387,9 @@
     }
 
     function exportarExcel() {
-      const lista = JSON.parse(localStorage.getItem(usuarioAtual)) || [];
-      if (!lista.length) return alert("Sem dados!");
-      const conteudo = "UUID,Nome,Sobrenome,Email\n" + lista.map(u => `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"`).join("\n");
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      let conteudo = "UUID,Nome,Sobrenome,Email\n";
+      lista.forEach(u => conteudo += `"${u.uuid}","${u.nome}","${u.sobrenome}","${u.email}"\n`);
       const blob = new Blob([conteudo], { type: "text/csv" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -360,24 +397,18 @@
       a.click();
     }
 
-    async function exportarPDF(uuid = null) {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const lista = JSON.parse(localStorage.getItem(usuarioAtual)) || [];
-      let dados = uuid ? lista.filter(u => u.uuid === uuid) : lista;
-      doc.setFontSize(14);
-      doc.text("Relatório de Usuários", 70, 15);
-      let y = 30;
-      dados.forEach(u => {
-        doc.text(`UUID: ${u.uuid}`, 10, y);
-        doc.text(`Nome: ${u.nome}`, 10, y + 8);
-        doc.text(`Sobrenome: ${u.sobrenome}`, 10, y + 16);
-        doc.text(`Email: ${u.email}`, 10, y + 24);
-        y += 35;
-      });
-      doc.save(uuid ? `usuario_${uuid}.pdf` : "usuarios.pdf");
+    function exportarPDF() {
+      const lista = JSON.parse(localStorage.getItem("usuarios")) || [];
+      let conteudo = "Cadastro de Usuários\n\n";
+      lista.forEach(u => conteudo += `${u.nome} ${u.sobrenome} - ${u.email}\n`);
+      const blob = new Blob([conteudo], { type: "application/pdf" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "usuarios.pdf";
+      a.click();
     }
-  </script>
 
+    mostrar();
+  </script>
 </body>
 </html>
