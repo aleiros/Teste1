@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sistema Local - Login + Cadastro Avançado + Busca + PDF</title>
+  <title>Sistema Local - Renovado (Login + Cadastro + PDF + Busca)</title>
 
   <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -12,7 +12,7 @@
     /* ---------- Geral ---------- */
     body{font-family:Arial,system-ui; margin:0; background:#f6f7fb; color:#222}
     h2{text-align:center;margin:14px 0}
-    .container{max-width:900px;margin:30px auto;background:#fff;padding:16px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
+    .container{max-width:980px;margin:24px auto;background:#fff;padding:16px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
     input, select, textarea{padding:8px;border:1px solid #ccd; border-radius:6px;box-sizing:border-box}
     button{background:#2E8B57;color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer}
     button.gray{background:#777} button.warn{background:#d9534f} button.blue{background:#2196F3} button.purple{background:#8e44ad}
@@ -42,6 +42,7 @@
     .msg{font-weight:600;color:#b00;margin-top:6px}
     .searchBox{display:flex;gap:8px;align-items:center}
     .searchBox input{flex:1}
+    .small{font-size:0.9rem;padding:6px 8px}
   </style>
 </head>
 <body>
@@ -107,10 +108,11 @@
 
       <div class="row" style="margin-top:8px;align-items:center">
         <div class="searchBox col">
-          <input id="searchInput" placeholder="Buscar (procura em UUID, Nome, Sobrenome, Email)" oninput="mostrar()">
+          <input id="searchInput" placeholder="Buscar (UUID, Nome, Sobrenome, Email)" oninput="mostrar()">
         </div>
-        <div style="min-width:160px">
-          <button class="gray" onclick="mostrar(true)">Limpar / Atualizar</button>
+        <div style="min-width:160px;display:flex;gap:8px">
+          <button class="gray small" onclick="mostrar(true)">Limpar / Atualizar</button>
+          <button class="gray small" onclick="apagarConta()">Apagar conta</button>
         </div>
       </div>
     </div>
@@ -130,9 +132,14 @@
 
 <script>
 /* ============================
+   CONFIGURÁVEIS
+   - pdfLogoBase64: cole aqui seu logo em base64 se quiser
+   ============================ */
+const pdfLogoBase64 = ''; // ex: "data:image/png;base64,iVBORw0K..." (deixe vazio para sem logo)
+
+/* ============================
    UTIL / AUTENTICAÇÃO
    ============================ */
-
 function safeEmailKey(email){ return 'cadastros_' + encodeURIComponent(email.toLowerCase()); }
 
 function gerarUUID(){
@@ -168,12 +175,12 @@ function registrar(){
   const conf = document.getElementById('regSenhaConf').value;
   const msg = document.getElementById('regMsg');
 
-  if(!nome||!email||!senha||!conf){ msg.textContent='Preencha todos os campos!'; return; }
-  if(senha.length<4){ msg.textContent='Senha muito curta (mín.4).'; return; }
-  if(senha!==conf){ msg.textContent='Senhas não coincidem.'; return; }
+  if(!nome||!email||!senha||!conf){ msg.style.color='red'; msg.textContent='Preencha todos os campos!'; return; }
+  if(senha.length<4){ msg.style.color='red'; msg.textContent='Senha muito curta (mín.4).'; return; }
+  if(senha!==conf){ msg.style.color='red'; msg.textContent='Senhas não coincidem.'; return; }
 
   const users = JSON.parse(localStorage.getItem('usuarios'))||[];
-  if(users.find(u=>u.email===email)){ msg.textContent='E-mail já cadastrado.'; return; }
+  if(users.find(u=>u.email===email)){ msg.style.color='red'; msg.textContent='E-mail já cadastrado.'; return; }
 
   users.push({ nome, email, senha });
   localStorage.setItem('usuarios', JSON.stringify(users));
@@ -186,11 +193,11 @@ function entrar(){
   const email = document.getElementById('logEmail').value.trim().toLowerCase();
   const senha = document.getElementById('logSenha').value;
   const msg = document.getElementById('logMsg');
-  if(!email||!senha){ msg.textContent='Preencha e-mail e senha!'; return; }
+  if(!email||!senha){ msg.style.color='red'; msg.textContent='Preencha e-mail e senha!'; return; }
 
   const users = JSON.parse(localStorage.getItem('usuarios'))||[];
   const user = users.find(u => u.email===email && u.senha===senha);
-  if(!user){ msg.textContent='Credenciais inválidas.'; return; }
+  if(!user){ msg.style.color='red'; msg.textContent='Credenciais inválidas.'; return; }
   localStorage.setItem('usuarioLogado', JSON.stringify(user));
   iniciarSessao();
 }
@@ -246,6 +253,9 @@ function adicionarRegistro(){
 
 /* Mostrar tabela (com busca) */
 function mostrar(forceClear=false){
+  if(forceClear){
+    document.getElementById('searchInput').value = '';
+  }
   const tbody = document.querySelector('#tabela tbody');
   tbody.innerHTML = '';
   const lista = carregarLista();
@@ -253,7 +263,6 @@ function mostrar(forceClear=false){
 
   const filtrada = lista.filter(item => {
     if(!q) return true;
-    // busca em todos os campos: uuid, nome, sobrenome, email, criadoEm
     return [item.uuid, item.nome, item.sobrenome, item.email, item.criadoEm || '']
       .join(' ').toLowerCase().includes(q);
   });
@@ -276,7 +285,7 @@ function mostrar(forceClear=false){
     inEmail.onchange = ()=> atualizarCampo(item.uuid,'email', inEmail.value); tdEmail.appendChild(inEmail); tr.appendChild(tdEmail);
 
     const tdA = document.createElement('td'); tdA.setAttribute('data-label','Ações');
-    const btnAlt = document.createElement('button'); btnAlt.textContent='Salvar'; btnAlt.className=''; btnAlt.onclick = ()=> atualizarRegistro(item.uuid);
+    const btnAlt = document.createElement('button'); btnAlt.textContent='Salvar'; btnAlt.onclick = ()=> atualizarRegistro(item.uuid);
     const btnDel = document.createElement('button'); btnDel.textContent='Apagar'; btnDel.className='warn'; btnDel.onclick = ()=> apagar(item.uuid);
     const btnPdf = document.createElement('button'); btnPdf.textContent='PDF'; btnPdf.className='purple'; btnPdf.onclick = ()=> exportarPDFIndividual(item);
     tdA.append(btnAlt, btnDel, btnPdf);
@@ -318,6 +327,22 @@ function apagarTudo(){
   mostrar();
 }
 
+/* Apagar conta (remove usuário e todos os cadastros) */
+function apagarConta(){
+  if(!confirm('Apagar sua conta e todos os cadastros? Esta ação é irreversível.')) return;
+  const user = JSON.parse(localStorage.getItem('usuarioLogado'));
+  if(!user) return;
+  // remover usuário da lista global
+  let users = JSON.parse(localStorage.getItem('usuarios')) || [];
+  users = users.filter(u => u.email !== user.email);
+  localStorage.setItem('usuarios', JSON.stringify(users));
+  // remover cadastros do usuário
+  localStorage.removeItem(safeEmailKey(user.email));
+  // logout
+  sair();
+  alert('Conta e cadastros removidos.');
+}
+
 /* Gerar TXT / CSV */
 function gerarTXT(lista){
   let s = 'UUID\tNome\tSobrenome\tEmail\tCriadoEm\n';
@@ -341,7 +366,7 @@ function exportarExcel(){
 }
 
 /* ============================
-   PDF (individual e geral) - com cabeçalho e data
+   PDF (individual e geral) - com cabeçalho, data e logo opcional
    ============================ */
 
 function formatDateISOToReadable(iso){
@@ -352,12 +377,14 @@ function exportarPDFIndividual(item){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:'pt', format:'a4'});
 
-  // Cabeçalho (aqui você pode inserir um logo em base64)
-  // Exemplo: doc.addImage(base64logo, 'PNG', 40, 20, 80, 30);
+  // Cabeçalho (logo opcional)
+  if(pdfLogoBase64){
+    try{ doc.addImage(pdfLogoBase64, 'PNG', 40, 20, 80, 30); }catch(e){ console.warn('Erro ao inserir logo:', e); }
+  }
   doc.setFontSize(16);
-  doc.text('Relatório - Registro Individual', 40, 50);
+  doc.text('Relatório - Registro Individual', 140, 40);
   doc.setFontSize(10);
-  doc.text('Gerado em: ' + new Date().toLocaleString(), 40, 68);
+  doc.text('Gerado em: ' + new Date().toLocaleString(), 40, 70);
 
   let y = 110;
   doc.setFontSize(12);
@@ -377,12 +404,16 @@ function exportarPDFGeral(){
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:'pt', format:'a4'});
-  doc.setFontSize(16);
-  doc.text('Relatório Geral de Cadastros', 40, 50);
-  doc.setFontSize(10);
-  doc.text('Gerado em: ' + new Date().toLocaleString(), 40, 68);
 
-  let y = 100;
+  if(pdfLogoBase64){
+    try{ doc.addImage(pdfLogoBase64, 'PNG', 40, 20, 80, 30); }catch(e){ console.warn('Erro ao inserir logo:', e); }
+  }
+  doc.setFontSize(16);
+  doc.text('Relatório Geral de Cadastros', 140, 40);
+  doc.setFontSize(10);
+  doc.text('Gerado em: ' + new Date().toLocaleString(), 40, 70);
+
+  let y = 110;
   doc.setFontSize(11);
   lista.forEach((u, idx) => {
     doc.text(`${idx+1}. UUID: ${u.uuid}`, 40, y); y += 14;
@@ -391,7 +422,7 @@ function exportarPDFGeral(){
     doc.text(`   Email: ${u.email}`, 40, y); y += 18;
     if(u.criadoEm){ doc.text(`   Criado em: ${formatDateISOToReadable(u.criadoEm)}`, 40, y); y += 18; }
     y += 6;
-    if(y > 750){ doc.addPage(); y = 50; }
+    if(y > 740){ doc.addPage(); y = 60; }
   });
 
   doc.save('cadastros_geral.pdf');
@@ -407,7 +438,7 @@ window.addEventListener('load', ()=>{
   else { mostrarRegister(); }
 });
 
-/* expor funções de botão de login (no formulário onde se alterou texto) */
+/* Tornar funções acessíveis globalmente (botões inline) */
 window.registrar = registrar;
 window.entrar = entrar;
 window.mostrarLogin = mostrarLogin;
@@ -421,6 +452,7 @@ window.exportarTXT = exportarTXT;
 window.exportarExcel = exportarExcel;
 window.exportarPDFIndividual = exportarPDFIndividual;
 window.exportarPDFGeral = exportarPDFGeral;
+window.apagarConta = apagarConta;
 </script>
 </body>
 </html>
